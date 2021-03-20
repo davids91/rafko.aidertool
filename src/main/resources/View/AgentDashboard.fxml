@@ -9,7 +9,7 @@
 
 <VBox fx:id="rootVBox" alignment="CENTER_RIGHT" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AgentDashboardController">
    <children>
-      <HBox alignment="CENTER_RIGHT">
+      <HBox fx:id="status_bar" alignment="CENTER_RIGHT">
          <children>
             <MenuButton fx:id="menuButton" mnemonicParsing="false" prefHeight="30.0">
                <items>
