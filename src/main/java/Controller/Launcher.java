@@ -23,12 +23,12 @@ public class Launcher extends Application {
         });
         Parent root = loader.load();
 
-        Scene scene = new Scene(root, 50, Screen.getPrimary().getBounds().getHeight() * 0.90);
+        Scene scene = new Scene(root, 75, 200);
 
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add("/Style/main.css");
         scene.getStylesheets().add("/Style/agent.css");
-        primaryStage.setX(Screen.getPrimary().getBounds().getWidth() - 50);
+        primaryStage.setX(Screen.getPrimary().getBounds().getWidth() - 75);
         primaryStage.setY(Screen.getPrimary().getBounds().getHeight()/2.0f);
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.setScene(scene);
