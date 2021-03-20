@@ -1,10 +1,25 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.13'
+    }
+}
+
 plugins {
+    id 'idea'
     id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'com.github.ben-manes.versions' version '0.19.0'
+    id "com.google.protobuf" version "0.8.8"
 }
 
-group 'org.example'
+group 'org.rafko'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -14,8 +29,16 @@ repositories {
     }
 }
 
-dependencies {
+def grpcVersion = '1.30.1'
+def protobufVersion = '3.12.0'
 
+dependencies {
+    compile ('com.google.protobuf:protobuf-java:3.6.1:sources')
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 }
 
 javafx {
@@ -23,4 +46,4 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
-mainClassName = 'Controller.DealerApp'
+mainClassName = 'Controller.Launcher'
