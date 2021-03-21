@@ -1,5 +1,8 @@
 package Controller;
 
+import Services.RequesterClient;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -83,6 +86,13 @@ public class AgentDashboardController {
                 Platform.runLater(new Timeline(delayHideKf, hideKf)::play);
             }
         );
+
+        /* create Client */
+        System.out.println("Trying to connect..");
+        ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:50051")
+                .usePlaintext().build(); /* TODO: use SSL/TLS */
+        RequesterClient caller = new RequesterClient(channel,userId.getText());
+        caller.test();
     }
 
     private void hideStage(){

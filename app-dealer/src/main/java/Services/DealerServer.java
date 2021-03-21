@@ -2,6 +2,7 @@ package Services;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.stub.StreamObserver;
 import org.rafko.AiderTool.RequestDealer;
 import org.rafko.AiderTool.RequestHandlerGrpc;
 
@@ -13,9 +14,7 @@ public class DealerServer {
     private static final Logger logger = Logger.getLogger(DealerServer.class.getName());
     private Server server;
 
-    private void start() throws IOException {
-        /* The port on which the server should run */
-        int port = 50051;
+    public void start(int port) throws IOException {
         server = ServerBuilder.forPort(port)
                 .addService(new RequestHandlerImpl())
                 .build()
@@ -36,7 +35,7 @@ public class DealerServer {
         });
     }
 
-    private void stop() throws InterruptedException {
+    public void stop() throws InterruptedException {
         if (server != null) {
             server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
@@ -45,41 +44,48 @@ public class DealerServer {
     /**
      * Await termination on the main thread since the grpc library uses daemon threads.
      */
-    private void blockUntilShutdown() throws InterruptedException {
+    public void blockUntilShutdown() throws InterruptedException {
         if (server != null) {
             server.awaitTermination();
         }
     }
 
-    static class RequestHandlerImpl extends RequestHandlerGrpc.RequestHandlerImplBase {
+    private static class RequestHandlerImpl extends RequestHandlerGrpc.RequestHandlerImplBase {
         @Override
         public void addRequest(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-
+            System.out.println("addRequest call received from : " + request.getRequesterUUID() + "!");
         }
 
         @Override
         public void cancelRequest(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-
+            System.out.println("addRequest call received!");
         }
 
         @Override
         public void queryRequest(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-
+            System.out.println("cancelRequest call received!");
         }
 
         @Override
         public void queryRequests(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-
+            System.out.println("queryRequests call received!");
         }
 
         @Override
         public void initiate(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-
+            System.out.println("initiate call received!");
         }
 
         @Override
         public void finalize(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
+            System.out.println("finalize call received!");
+        }
 
+        @Override
+        public void ping(RequestDealer.AidRequest request, StreamObserver<RequestDealer.AidToken> responseObserver) {
+            System.out.println("ping received from : " + request.getRequesterUUID() + "!");
+            responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestState.STATE_REQUEST_OK).build());
+            responseObserver.onCompleted();
         }
     }
 

@@ -1,5 +1,6 @@
 package Controller;
 
+import Services.DealerServer;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -14,6 +15,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -27,6 +29,8 @@ public class DealerDashboardController {
     private TextField addressField;
     @FXML
     private Accordion requestList;
+
+    DealerServer dealerServer = new DealerServer();
 
     @FXML
     public void initialize() {
@@ -53,5 +57,11 @@ public class DealerDashboardController {
             final KeyFrame hideKf = new KeyFrame(Duration.millis(500), transparent);
             Platform.runLater(new Timeline(delayHideKf, hideKf)::play);
         });
+
+        try {
+            dealerServer.start(50051);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

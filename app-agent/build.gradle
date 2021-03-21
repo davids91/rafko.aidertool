@@ -16,6 +16,18 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
-application{
+application {
     mainClassName = 'Controller.Launcher'
+}
+
+def grpcVersion = '1.35.0'
+def protobufVersion = '3.12.0'
+
+dependencies {
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+    compile project(':shared-protocol')
 }

@@ -9,6 +9,7 @@ enum RequestState{
   STATE_UNKNOWN = 0;
   STATE_INVALID = 1;
   STATE_REQUEST_REJECTED = 2;
+  STATE_REQUEST_OK = 3;
   STATE_OPEN = 10;
   STATE_WAITING = 11;
   STATE_ACTIVE = 12;
@@ -30,6 +31,7 @@ message AidToken{
 }
 
 service RequestHandler{
+  rpc ping(AidRequest) returns (AidToken);
   rpc addRequest(AidRequest) returns (AidToken);
   rpc cancelRequest(AidRequest) returns (AidToken);
 
