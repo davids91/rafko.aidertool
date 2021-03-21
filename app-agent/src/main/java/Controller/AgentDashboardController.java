@@ -27,6 +27,7 @@ import java.net.UnknownHostException;
 public class AgentDashboardController {
     private final Image not_connected_icon = new Image("Img/not_connected.png");
     private final Image connected_icon = new Image("Img/connected.png");
+    private final String dealerAddress;
 
     @FXML
     private HBox status_bar;
@@ -43,8 +44,9 @@ public class AgentDashboardController {
     private double yOffset = 0;
     private boolean hideStage = false;
 
-    public AgentDashboardController(Stage parent_){
+    public AgentDashboardController(Stage parent_, String dealerAddress_){
         primaryStage = parent_;
+        dealerAddress = dealerAddress_;
     }
     @FXML
     public void initialize() {
@@ -89,7 +91,7 @@ public class AgentDashboardController {
 
         /* create Client */
         System.out.println("Trying to connect..");
-        ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:50051")
+        ManagedChannel channel = ManagedChannelBuilder.forTarget(dealerAddress)
                 .usePlaintext().build(); /* TODO: use SSL/TLS */
         RequesterClient caller = new RequesterClient(channel,userId.getText());
         caller.test();

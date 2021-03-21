@@ -11,9 +11,15 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 public class Launcher extends Application {
+    private static String dealerAddress;
 
     public static void main(String[] args){
-        for(String arg : args) System.out.println(arg);
+        if(0 == args.length)
+            dealerAddress = "localhost:50051";
+        else if(1 >= args.length)
+            dealerAddress = args[0] + ":50051";
+        else dealerAddress = args[0] + ":" + args[1];
+        System.out.println("Trying dealer address: " + dealerAddress);
         launch(args);
     }
 
@@ -23,7 +29,7 @@ public class Launcher extends Application {
         loader.setControllerFactory(new Callback<Class<?>, Object>() {
             @Override
             public Object call(Class<?> param) {
-                return new AgentDashboardController(primaryStage);
+                return new AgentDashboardController(primaryStage, dealerAddress);
             }
         });
         Parent root = loader.load();
