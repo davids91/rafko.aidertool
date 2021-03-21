@@ -1,4 +1,5 @@
 rootProject.name = 'AiderTool'
 
+include 'shared-protocol'
 include 'app-agent'
 include 'app-dealer'

@@ -1,0 +1,41 @@
+
+syntax = "proto3";
+option java_package = "org.rafko.AiderTool";
+option java_outer_classname = "RequestDealer";
+
+package AiderTool;
+
+enum RequestState{
+  STATE_UNKNOWN = 0;
+  STATE_INVALID = 1;
+  STATE_REQUEST_REJECTED = 2;
+  STATE_OPEN = 10;
+  STATE_WAITING = 11;
+  STATE_ACTIVE = 12;
+  STATE_PENDING = 13;
+  STATE_FINISHED = 20;
+  STATE_CANCELLED = 21;
+}
+
+message AidRequest{
+  string requesterUUID = 1;
+  repeated string tags = 10;
+}
+
+message AidToken{
+  uint32 requestID = 1;
+  string UserUUID = 2;
+  string tags = 10;
+  RequestState state = 11;
+}
+
+service RequestHandler{
+  rpc addRequest(AidRequest) returns (AidToken);
+  rpc cancelRequest(AidRequest) returns (AidToken);
+
+  rpc queryRequest(AidToken) returns (AidToken);
+  rpc queryRequests(AidToken) returns (stream AidToken);
+
+  rpc initiate(AidToken) returns (AidToken);
+  rpc finalize(AidToken) returns (AidToken);
+}
