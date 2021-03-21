@@ -20,10 +20,8 @@ public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/View/DealerDashboard.fxml"));
-
         Scene scene = new Scene(root, 800,600);
         primaryStage.setScene(scene);
-        primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
     }
 }
