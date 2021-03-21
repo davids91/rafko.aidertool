@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -12,6 +11,12 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 public class Launcher extends Application {
+
+    public static void main(String[] args){
+        for(String arg : args) System.out.println(arg);
+        launch(args);
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/AgentDashboard.fxml"));

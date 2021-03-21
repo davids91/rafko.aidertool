@@ -1,2 +1,4 @@
 rootProject.name = 'AiderTool'
 
+include 'app-agent'
+include 'app-dealer'

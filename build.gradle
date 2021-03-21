@@ -13,8 +13,6 @@ buildscript {
 plugins {
     id 'idea'
     id 'java'
-    id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'com.github.ben-manes.versions' version '0.19.0'
     id "com.google.protobuf" version "0.8.8"
 }
@@ -40,10 +38,3 @@ dependencies {
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
     implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 }
-
-javafx {
-    version = "11.0.2"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
-}
-
-mainClassName = 'Controller.Launcher'
