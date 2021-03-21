@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -7,8 +8,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="rootVBox" alignment="CENTER_RIGHT" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AgentDashboardController">
+<VBox fx:id="rootVBox" alignment="CENTER_LEFT" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AgentDashboardController">
    <children>
+      <Label fx:id="userId" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: yellow;" text="uids">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font></Label>
       <HBox fx:id="status_bar" alignment="CENTER_RIGHT">
          <children>
             <MenuButton fx:id="menuButton" mnemonicParsing="false" prefHeight="30.0">

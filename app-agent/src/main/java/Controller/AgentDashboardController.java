@@ -7,20 +7,19 @@ import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.SplitMenuButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import javax.swing.*;
+import java.net.UnknownHostException;
 
 public class AgentDashboardController {
     private final Image not_connected_icon = new Image("Img/not_connected.png");
@@ -34,6 +33,8 @@ public class AgentDashboardController {
     private Button moveButton;
     @FXML
     private VBox rootVBox;
+    @FXML
+    private Label userId;
 
     private final Stage primaryStage;
     private double yOffset = 0;
@@ -48,6 +49,13 @@ public class AgentDashboardController {
         icon.setFitWidth(15);
         icon.setFitHeight(15);
         menuButton.setGraphic(icon);
+
+        try {
+            userId.setText(java.net.InetAddress.getLocalHost().getHostName() + "/" + System.getProperty("user.name"));
+        } catch (UnknownHostException e) {
+            userId.setText(System.getProperty("user.name"));
+            e.printStackTrace();
+        }
 
         moveButton.setOnMousePressed(event -> yOffset = event.getSceneY());
         moveButton.setOnMouseDragged(event -> primaryStage.setY(event.getScreenY() - yOffset));
@@ -78,14 +86,16 @@ public class AgentDashboardController {
     }
 
     private void hideStage(){
-        status_bar.setAlignment(Pos.CENTER_LEFT);
         rootVBox.setAlignment(Pos.CENTER_LEFT);
+        status_bar.setAlignment(Pos.CENTER_LEFT);
+        userId.setVisible(false);
         Platform.runLater(()-> primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth()*0.1)));
     }
 
     private void showStage(){
-        status_bar.setAlignment(Pos.CENTER_RIGHT);
         rootVBox.setAlignment(Pos.CENTER_RIGHT);
+        status_bar.setAlignment(Pos.CENTER_RIGHT);
+        userId.setVisible(true);
         Platform.runLater(()->primaryStage.setX(Screen.getPrimary().getBounds().getWidth() - primaryStage.getWidth()));
     }
 
