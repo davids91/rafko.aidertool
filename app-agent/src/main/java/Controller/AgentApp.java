@@ -26,12 +26,7 @@ public class AgentApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/AgentDashboard.fxml"));
-        loader.setControllerFactory(new Callback<Class<?>, Object>() {
-            @Override
-            public Object call(Class<?> param) {
-                return new AgentDashboardController(primaryStage, dealerAddress);
-            }
-        });
+        loader.setControllerFactory(param -> new AgentDashboardController(primaryStage, dealerAddress));
         Parent root = loader.load();
 
         Scene scene = new Scene(root, primaryStage.getWidth(), 200);

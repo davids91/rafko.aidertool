@@ -28,17 +28,11 @@ public class AgentDashboardController {
     private final Image not_connected_icon = new Image("Img/not_connected.png");
     private final Image connected_icon = new Image("Img/connected.png");
     private final String dealerAddress;
-
-    @FXML
-    private HBox status_bar;
-    @FXML
-    private MenuButton menuButton;
-    @FXML
-    private Button moveButton;
-    @FXML
-    private VBox rootVBox;
-    @FXML
-    private Label userId;
+    @FXML HBox status_bar;
+    @FXML MenuButton menuButton;
+    @FXML Button moveButton;
+    @FXML VBox rootVBox;
+    @FXML Label userId;
 
     private final Stage primaryStage;
     private double yOffset = 0;
@@ -101,14 +95,16 @@ public class AgentDashboardController {
         rootVBox.setAlignment(Pos.CENTER_LEFT);
         status_bar.setAlignment(Pos.CENTER_LEFT);
         userId.setVisible(false);
-        Platform.runLater(()-> primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth()*0.1)));
+        Platform.runLater(() -> primaryStage.setWidth(30));
+        Platform.runLater(()-> primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth())));
     }
 
     private void showStage(){
         rootVBox.setAlignment(Pos.CENTER_RIGHT);
         status_bar.setAlignment(Pos.CENTER_RIGHT);
         userId.setVisible(true);
-        Platform.runLater(()->primaryStage.setX(Screen.getPrimary().getBounds().getWidth() - primaryStage.getWidth()));
+        Platform.runLater(() -> primaryStage.setWidth(300));
+        Platform.runLater(()-> primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth())));
     }
 
     private SplitMenuButton createButtonForAidRequests(String... tags){
