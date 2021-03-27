@@ -16,13 +16,12 @@
     <RowConstraints maxHeight="566.0" minHeight="10.0" prefHeight="566.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <HBox alignment="CENTER_LEFT" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-         <children>
-            <Label text="Address:" />
-            <TextField fx:id="addressField" editable="false" text="-" />
-            <ImageView fx:id="clipboard_img" fitHeight="32.0" fitWidth="32.0" opacity="0.0" pickOnBounds="true" preserveRatio="true" visible="true" />
-         </children>
-      </HBox>
+       <VBox GridPane.rowIndex="1">
+           <children>
+               <fx:include source="CopyAbleField.fxml" />
+               <fx:include source="CopyAbleField.fxml" />
+           </children>
+       </VBox>
       <Accordion fx:id="requestList" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
       <Label alignment="CENTER" text="Stats" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
       <Label text="Active requests" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />

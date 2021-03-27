@@ -4,11 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.util.Callback;
 
 public class Launcher extends Application {
 
@@ -19,8 +15,19 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/View/DealerDashboard.fxml"));
-        Scene scene = new Scene(root, 800,600);
+        final int[] copyableFieldsLoaded = {0};
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/DealerDashboard.fxml"));
+        loader.setControllerFactory((Class<?> controllerType) ->{
+            if(controllerType == CopyAbleFieldController.class){
+                if(0 == copyableFieldsLoaded[0]){
+                    ++copyableFieldsLoaded[0];
+                    return new LocalIPFieldController();
+                }else return new GlobalIPFieldController();
+            }else{
+                return new DealerDashboardController();
+            }
+        });
+        Parent root = loader.load();        Scene scene = new Scene(root, 800,600);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
