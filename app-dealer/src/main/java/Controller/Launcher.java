@@ -17,15 +17,15 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        final int[] copyableFieldsLoaded = {0};
-
+        final int[] copyableFieldsLoaded = {-1};
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/DealerDashboard.fxml"));
         loader.setControllerFactory((Class<?> controllerType) ->{
             if(controllerType == CopyAbleFieldController.class){
-                if(0 == copyableFieldsLoaded[0]){
-                    ++copyableFieldsLoaded[0];
-                    return new CopyAbleFieldController("LAN IP", stats.getLANIP());
-                }else return new CopyAbleFieldController("WAN IP", stats.getWANIP());
+                ++copyableFieldsLoaded[0];
+                return new CopyAbleFieldController(
+                    Stats.ContentDefinition.getName(copyableFieldsLoaded[0]),
+                    stats.getContent(copyableFieldsLoaded[0])
+                );
             }else{
                 return new DealerDashboardController();
             }
