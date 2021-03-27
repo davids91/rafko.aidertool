@@ -13,8 +13,8 @@
     fx:controller="Controller.CopyAbleFieldController"
     prefHeight="400.0" prefWidth="600.0">
     <children>
-        <Label fx:id="fieldName" text="" />
-        <TextField fx:id="addressField" editable="false" text="-" />
+        <Label fx:id="fieldNameLabel" text="&lt;NAME&gt;" />
+        <TextField fx:id="fieldValueTextField" editable="false" text="&lt;VALUE&gt;" />
         <ImageView fx:id="clipboard_img" fitHeight="32.0" fitWidth="32.0" opacity="0.0" pickOnBounds="true" preserveRatio="true" visible="true">
             <image>
                 <Image url="@../Img/clipboard.png" />

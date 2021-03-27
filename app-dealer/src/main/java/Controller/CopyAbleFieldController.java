@@ -17,22 +17,26 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public abstract class CopyAbleFieldController implements Initializable {
-    @FXML Label fieldName;
+public class CopyAbleFieldController implements Initializable {
+    @FXML Label fieldNameLabel;
     @FXML ImageView clipboard_img;
-    @FXML TextField addressField;
+    @FXML TextField fieldValueTextField;
 
-    abstract String getText();
-    abstract String getFieldName();
+    private final String fieldName;
+    private final String fieldValue;
+    public CopyAbleFieldController(String name, String value){
+        fieldName = name;
+        fieldValue = value;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        addressField.setText(getText());
-        fieldName.setText(getFieldName() + ":");
-        addressField.setOnMouseClicked(event -> {
-            addressField.selectAll();
+        fieldNameLabel.setText(fieldName + ":");
+        fieldValueTextField.setText(fieldValue);
+        fieldValueTextField.setOnMouseClicked(event -> {
+            fieldValueTextField.selectAll();
             final ClipboardContent content = new ClipboardContent();
-            content.put(DataFormat.PLAIN_TEXT, addressField.getText());
+            content.put(DataFormat.PLAIN_TEXT, fieldValueTextField.getText());
             Clipboard.getSystemClipboard().setContent(content);
 
             KeyValue transparent = new KeyValue(clipboard_img.opacityProperty(), 0.0);
