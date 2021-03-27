@@ -1,8 +1,5 @@
-package Controller;
+package org.rafko.aidertool.appagent.controller;
 
-import Services.RequesterClient;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -15,16 +12,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.swing.*;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AgentDashboardController {
+    private static final Logger LOGGER = Logger.getLogger(AgentDashboardController.class.getName());
     private final Image not_connected_icon = new Image("Img/not_connected.png");
     private final Image connected_icon = new Image("Img/connected.png");
     private final String dealerAddress;
@@ -84,6 +82,7 @@ public class AgentDashboardController {
         );
 
         /* create Client */
+        LOGGER.log(Level.SEVERE, "No connection to dealer!");
 //        System.out.println("Trying to connect..");
 //        ManagedChannel channel = ManagedChannelBuilder.forTarget(dealerAddress)
 //                .usePlaintext().build(); /* TODO: use SSL/TLS */

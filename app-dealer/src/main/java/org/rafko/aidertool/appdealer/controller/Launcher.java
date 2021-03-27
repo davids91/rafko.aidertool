@@ -1,17 +1,24 @@
-package Controller;
+package org.rafko.aidertool.appdealer.controller;
 
-import Models.Stats;
+import org.rafko.aidertool.appdealer.models.Stats;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Launcher extends Application {
-    private static Stats stats = new Stats();
+    private static final Logger LOGGER = Logger.getLogger(Launcher.class.getName());
+    private static final Stats stats = new Stats();
 
     public static void main(String[] args){
-        for(String arg : args) System.out.println(arg);
+        if(0 < args.length){
+            LOGGER.log(Level.INFO, "Program arguments: ");
+            for(String arg : args) LOGGER.log(Level.INFO, "->" + arg);
+        }
         launch(args);
     }
 
@@ -30,7 +37,8 @@ public class Launcher extends Application {
                 return new DealerDashboardController();
             }
         });
-        Parent root = loader.load();        Scene scene = new Scene(root, 800,200);
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 800,200);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

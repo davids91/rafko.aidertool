@@ -10,7 +10,7 @@
 <?import javafx.scene.image.Image?>
 <HBox alignment="CENTER_LEFT" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER"
     xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-    fx:controller="Controller.CopyAbleFieldController"
+    fx:controller="org.rafko.aidertool.appdealer.controller.CopyAbleFieldController"
     prefHeight="400.0" prefWidth="600.0">
     <children>
         <Label fx:id="fieldNameLabel" text="&lt;NAME&gt;" />

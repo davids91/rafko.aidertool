@@ -1,4 +1,4 @@
-package Controller;
+package org.rafko.aidertool.appagent.controller;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,9 +8,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Callback;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AgentApp extends Application {
+    private static final Logger LOGGER = Logger.getLogger(AgentApp.class.getName());
     private static String dealerAddress;
 
     public static void main(String[] args){
@@ -19,7 +22,7 @@ public class AgentApp extends Application {
         else if(1 >= args.length)
             dealerAddress = args[0] + ":50051";
         else dealerAddress = args[0] + ":" + args[1];
-        System.out.println("Trying dealer address: " + dealerAddress);
+        LOGGER.log(Level.INFO,"Trying dealer address: " + dealerAddress);
         launch(args);
     }
 

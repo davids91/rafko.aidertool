@@ -1,8 +1,12 @@
-package Models;
+package org.rafko.aidertool.appdealer.models;
 
-import Services.NetUtil;
+import org.rafko.aidertool.appdealer.services.NetUtil;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Stats {
+    private static final Logger LOGGER = Logger.getLogger(Stats.class.getName());
     public enum ContentDefinition{
         LAN_IP, WAN_IP, CONTENTS_SIZE;
         private static final ContentDefinition[] valuesArr = values();
@@ -18,6 +22,11 @@ public class Stats {
     }
 
     public String getContent(int index){
-        return contents[index];
+        if((0 <= index)&&(ContentDefinition.CONTENTS_SIZE.ordinal() > index))
+            return contents[index];
+        else{
+            LOGGER.log(Level.SEVERE, "Content index("+index+"/"+ContentDefinition.CONTENTS_SIZE.ordinal()+") out of bounds!");
+            return "";
+        }
     }
 }

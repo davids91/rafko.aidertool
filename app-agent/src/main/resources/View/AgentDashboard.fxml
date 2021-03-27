@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="rootVBox" alignment="CENTER_LEFT" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AgentDashboardController">
+<VBox fx:id="rootVBox" alignment="CENTER_LEFT" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.rafko.aidertool.appagent.controller.AgentDashboardController">
    <children>
       <Label fx:id="userId" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: yellow;" text="uids">
          <font>

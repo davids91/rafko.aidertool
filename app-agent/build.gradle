@@ -30,14 +30,14 @@ dependencies {
 }
 
 application {
-    mainClassName = 'Launcher'
+    mainClassName = 'org.rafko.aidertool.appagent.controller.Launcher'
 }
 
 jar {
     manifest {
         attributes (
             'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-            'Main-Class': 'Launcher'
+            'Main-Class': application.getMainClass()
         )
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -48,7 +48,7 @@ task fatJar(type: Jar) {
     targetCompatibility = '1.8'
     manifest {
         attributes 'Implementation-Title': 'Aider Tool',
-                'Main-Class': 'Launcher'
+                'Main-Class': application.getMainClass()
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar

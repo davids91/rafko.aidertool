@@ -30,7 +30,7 @@ dependencies {
 }
 
 application {
-    mainClassName = 'Controller.Launcher'
+    mainClassName = 'org.rafko.aidertool.appdealer.controller.Launcher'
 }
 
 jar {

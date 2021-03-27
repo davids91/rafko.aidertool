@@ -1,11 +1,15 @@
-package Services;
+package org.rafko.aidertool.appdealer.services;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NetUtil {
+    private static final Logger LOGGER = Logger.getLogger(NetUtil.class.getName());
+
     public static String getLANIP(){
         String text = "<UNKNOWN>";
         /* get the IP address and display it */
@@ -13,7 +17,7 @@ public class NetUtil {
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             text = socket.getLocalAddress().getHostAddress();
         } catch (SocketException | UnknownHostException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Unable to read local IP address! ", e);
         }
         return text;
     }
@@ -25,7 +29,7 @@ public class NetUtil {
         try (java.util.Scanner s = new java.util.Scanner(new java.net.URL("https://ip.seeip.org").openStream(), "UTF-8").useDelimiter("\\A")) {
             text = s.next();
         } catch (java.io.IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Unable to read global IP address! ", e);
         }
         return text;
     }
