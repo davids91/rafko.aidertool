@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
-public class Launcher extends Application {
+public class AgentApp extends Application {
     private static String dealerAddress;
 
     public static void main(String[] args){

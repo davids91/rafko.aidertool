@@ -90,11 +90,11 @@ public class AgentDashboardController {
         );
 
         /* create Client */
-        System.out.println("Trying to connect..");
-        ManagedChannel channel = ManagedChannelBuilder.forTarget(dealerAddress)
-                .usePlaintext().build(); /* TODO: use SSL/TLS */
-        RequesterClient caller = new RequesterClient(channel,userId.getText());
-        caller.test();
+//        System.out.println("Trying to connect..");
+//        ManagedChannel channel = ManagedChannelBuilder.forTarget(dealerAddress)
+//                .usePlaintext().build(); /* TODO: use SSL/TLS */
+//        RequesterClient caller = new RequesterClient(channel,userId.getText());
+//        caller.test();
     }
 
     private void hideStage(){
