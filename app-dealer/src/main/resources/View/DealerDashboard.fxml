@@ -26,5 +26,12 @@
       <Label alignment="CENTER" text="Stats" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
       <Label text="Active requests" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
       <Label text="Tags" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+      <TableView fx:id="requestsTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+        <columns>
+          <TableColumn fx:id="requesterColumn" minWidth="-Infinity" prefWidth="-1.0" text="Requester" />
+          <TableColumn fx:id="stateColumn" prefWidth="-1.0" text="State" />
+            <TableColumn fx:id="tagsColumn" prefWidth="-1.0" text="Tags" />
+        </columns>
+      </TableView>
    </children>
 </GridPane>

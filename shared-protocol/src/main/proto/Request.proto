@@ -20,14 +20,16 @@ enum RequestState{
 
 message AidRequest{
   string requesterUUID = 1;
-  repeated string tags = 10;
+  RequestState state = 10;
+  repeated string tags = 11;
 }
 
 message AidToken{
   uint32 requestID = 1;
   string UserUUID = 2;
-  string tags = 10;
-  RequestState state = 11;
+  RequestState state = 10;
+  repeated string tags = 11;
+  repeated string data = 12;
 }
 
 service RequestHandler{
