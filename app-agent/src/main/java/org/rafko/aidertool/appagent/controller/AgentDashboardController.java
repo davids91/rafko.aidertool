@@ -1,5 +1,7 @@
 package org.rafko.aidertool.appagent.controller;
 
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -16,6 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.rafko.aidertool.appagent.models.Stats;
+import org.rafko.aidertool.appagent.services.RequesterClient;
 
 import java.net.UnknownHostException;
 import java.util.logging.Level;
@@ -23,10 +27,10 @@ import java.util.logging.Logger;
 
 public class AgentDashboardController {
     private static final Logger LOGGER = Logger.getLogger(AgentDashboardController.class.getName());
-    private final Image not_connected_icon = new Image("Img/not_connected.png");
-    private final Image connected_icon = new Image("Img/connected.png");
-    private final String dealerAddress;
-    @FXML HBox status_bar;
+    private final Image notConnectedIcon = new Image("Img/not_connected.png");
+    private final Image connectedIcon = new Image("Img/connected.png");
+    @FXML ImageView statusIcon;
+    @FXML HBox statusBar;
     @FXML MenuButton menuButton;
     @FXML Button moveButton;
     @FXML VBox rootVBox;
@@ -35,25 +39,56 @@ public class AgentDashboardController {
     private final Stage primaryStage;
     private double yOffset = 0;
     private boolean hideStage = false;
+    private final Thread connectionThread;
+    private final RequesterClient caller;
+    private final Stats stats;
+    private boolean running = true;
+    private boolean connected = false;
 
-    public AgentDashboardController(Stage parent_, String dealerAddress_){
+    private synchronized boolean isConnected(){
+        return connected;
+    }
+
+    private synchronized boolean isRunning(){
+        return running;
+    }
+
+    private synchronized void setConnected(boolean newValue){
+        connected = newValue;
+    }
+
+    private synchronized void stopRunning(){
+        running = false;
+    }
+
+    public AgentDashboardController(Stage parent_, Stats stats_){
+        stats = stats_;
         primaryStage = parent_;
-        dealerAddress = dealerAddress_;
+        ManagedChannel channel = ManagedChannelBuilder.forTarget(stats.getDealerAddress())
+                .usePlaintext().build(); /* TODO: use SSL/TLS */
+        caller = new RequesterClient(channel, stats.getUserName());
+        connectionThread = new Thread(() -> {
+            while(isRunning()){
+                if (caller.testConnection()) {
+                    setConnected(true);
+                    setUIToConnected();
+                } else {
+                    setConnected(true);
+                    setUItoDisconnected();
+                }
+                try {
+                    if(isConnected()) Thread.sleep(30000);
+                    else Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.WARNING,"Connection thread interrupted!");
+                }
+            }
+        });
+
     }
     @FXML
     public void initialize() {
-        ImageView icon = new ImageView(not_connected_icon);
-        icon.setFitWidth(15);
-        icon.setFitHeight(15);
-        menuButton.setGraphic(icon);
-
-        try {
-            userId.setText(java.net.InetAddress.getLocalHost().getHostName() + "/" + System.getProperty("user.name"));
-        } catch (UnknownHostException e) {
-            userId.setText(System.getProperty("user.name"));
-            e.printStackTrace();
-        }
-
+        userId.setText(stats.getUserName());
         moveButton.setOnMousePressed(event -> yOffset = event.getSceneY());
         moveButton.setOnMouseDragged(event -> primaryStage.setY(event.getScreenY() - yOffset));
 
@@ -80,30 +115,37 @@ public class AgentDashboardController {
                 Platform.runLater(new Timeline(delayHideKf, hideKf)::play);
             }
         );
+        connectionThread.start();
+    }
 
-        /* create Client */
-        LOGGER.log(Level.SEVERE, "No connection to dealer!");
-//        System.out.println("Trying to connect..");
-//        ManagedChannel channel = ManagedChannelBuilder.forTarget(dealerAddress)
-//                .usePlaintext().build(); /* TODO: use SSL/TLS */
-//        RequesterClient caller = new RequesterClient(channel,userId.getText());
-//        caller.test();
+    private void setUIToConnected(){
+        statusIcon.setImage(connectedIcon);
+    }
+
+    private void setUItoDisconnected(){
+        statusIcon.setImage(notConnectedIcon);
     }
 
     private void hideStage(){
         rootVBox.setAlignment(Pos.CENTER_LEFT);
-        status_bar.setAlignment(Pos.CENTER_LEFT);
+        statusBar.setAlignment(Pos.CENTER_RIGHT);
         userId.setVisible(false);
-        Platform.runLater(() -> primaryStage.setWidth(30));
-        Platform.runLater(()-> primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth())));
+        Platform.runLater(() -> {
+            menuButton.setPrefWidth(0.0);
+            primaryStage.setWidth(30);
+            primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth()));
+        });
     }
 
     private void showStage(){
         rootVBox.setAlignment(Pos.CENTER_RIGHT);
-        status_bar.setAlignment(Pos.CENTER_RIGHT);
+        statusBar.setAlignment(Pos.CENTER_RIGHT);
         userId.setVisible(true);
-        Platform.runLater(() -> primaryStage.setWidth(300));
-        Platform.runLater(()-> primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth())));
+        Platform.runLater(() -> {
+            menuButton.setPrefWidth(MenuButton.USE_COMPUTED_SIZE);
+            primaryStage.setWidth(300);
+            primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth()));
+        });
     }
 
     private SplitMenuButton createButtonForAidRequests(String... tags){
@@ -129,6 +171,12 @@ public class AgentDashboardController {
     }
 
     public void quitApp() {
+        stopRunning();
+        try {
+            connectionThread.join();
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING, "Connection checked thread interrupted",e);
+        }
         Platform.exit();
         System.exit(0);
     }
