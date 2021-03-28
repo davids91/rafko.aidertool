@@ -57,6 +57,12 @@ public class DealerServer {
         @Override
         public void addRequest(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.INFO,"addRequest call received from : " + request.getRequesterUUID() + "!");
+            LOGGER.log(Level.INFO, "Tags of request:");
+            for(int i = 0; i<request.getTagsCount(); ++i){
+                LOGGER.log(Level.INFO,request.getTags(i));
+            }
+            responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestState.STATE_REQUEST_OK).build());
+            responseObserver.onCompleted();
         }
 
         @Override

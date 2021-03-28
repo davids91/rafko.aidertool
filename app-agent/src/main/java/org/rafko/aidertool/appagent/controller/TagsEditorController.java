@@ -12,13 +12,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Stage;
 import org.rafko.aidertool.appagent.models.Stats;
 import org.rafko.aidertool.appagent.services.StringUtil;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class TagsEditorController implements Initializable {
@@ -27,6 +30,7 @@ public class TagsEditorController implements Initializable {
     private static final ImageView closeIcon = new ImageView(new Image("Img/close.png"));
     private static final String tagsRegex = "(?<!^) +";
 
+    private final Consumer<List<String>> finalizeMethod;
     private final ArrayList<String> typedTagsList = new ArrayList<>();
     private final FilteredList<String> displayedTags;
     private final Stats stats;
@@ -35,8 +39,9 @@ public class TagsEditorController implements Initializable {
     @FXML TextField tagsField;
     @FXML FlowPane tagsFlowPane;
 
-    public TagsEditorController(Stats stats_){
+    public TagsEditorController(Stats stats_, Consumer<List<String>> finalizeMethod_){
         stats = stats_;
+        finalizeMethod = finalizeMethod_;
         displayedTags = new FilteredList<>(FXCollections.observableList(stats.getTags()));
         closeIcon.setFitWidth(16);
         closeIcon.setFitHeight(16);
@@ -132,6 +137,7 @@ public class TagsEditorController implements Initializable {
     }
 
     public void finalise(){
-
+        finalizeMethod.accept(typedTagsList); /* Consume the list of tags */
+        ((Stage)tagsField.getScene().getWindow()).close(); /* Close the window */
     }
 }

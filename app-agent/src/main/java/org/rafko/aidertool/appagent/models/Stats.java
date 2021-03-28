@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 public class Stats {
     private static final Logger LOGGER = Logger.getLogger(Stats.class.getName());
     private final String userName = userName();
+    private final ArrayList<String> tags = new ArrayList<>();
     private String dealerAddress = "localhost:50051";
-    private ArrayList<String> tags = new ArrayList<>();
 
     private String userName(){
         String value;

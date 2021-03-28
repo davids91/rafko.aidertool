@@ -28,4 +28,8 @@ public class RequesterClient {
         }
         return false;
     }
+
+    public RequestDealer.AidToken addRequest(RequestDealer.AidRequest request){
+        return blockingCaller.addRequest(request);
+    }
 }

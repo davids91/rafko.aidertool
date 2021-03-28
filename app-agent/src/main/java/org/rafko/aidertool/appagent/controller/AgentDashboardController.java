@@ -22,11 +22,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.rafko.AiderTool.RequestDealer;
 import org.rafko.aidertool.appagent.models.Stats;
 import org.rafko.aidertool.appagent.services.RequesterClient;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,8 +80,15 @@ public class AgentDashboardController {
         connectionThread = new Thread(this::connectionToServer);
     }
 
-    public void sendHelpRequest(String... tags){
-        for(String tag : tags)System.out.println("HELP!" + tag);
+    public void sendHelpRequest(List<String> tags){
+        if(isConnected()){ /* TODO: Handle communication in an async way */
+            RequestDealer.AidRequest request = RequestDealer.AidRequest.newBuilder()
+                    .addAllTags(tags).setRequesterUUID(stats.getUserName())
+                    .build();
+            if(RequestDealer.RequestState.STATE_REQUEST_OK ==
+            caller.addRequest(request)/* TODO: process accepted / denied requests */
+            .getState())System.out.println("SUCESS!");
+        }else LOGGER.log(Level.SEVERE,"Unable to request help, no recipient found..");
     }
 
     @FXML
@@ -205,7 +216,7 @@ public class AgentDashboardController {
         try {
             Stage tagTest = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/TagsEditor.fxml"));
-            loader.setControllerFactory(param -> new TagsEditorController(stats));
+            loader.setControllerFactory(param -> new TagsEditorController(stats, this::sendHelpRequest));
             Parent root = loader.load();
             Scene tagsScene = new Scene(root, 400, 200);
             tagTest.setScene(tagsScene);
