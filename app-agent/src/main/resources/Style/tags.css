@@ -1,0 +1,13 @@
+.tagBtn{
+      -fx-border-width: 1;
+      -fx-border-color: #04006b;
+      -fx-background-radius: 5;
+      -fx-background-color: rgba(255,255,128,1);
+      -fx-alignment: CENTER_LEFT;
+      -fx-text-fill: #828282;
+      -fx-border-radius: 5;
+      -fx-background-image: url(../Img/close.png);
+      -fx-background-size: 16px 16px;
+      -fx-background-repeat: no-repeat;
+      -fx-background-position: right;
+}

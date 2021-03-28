@@ -3,7 +3,6 @@ package org.rafko.aidertool.appdealer.controller;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 import org.rafko.AiderTool.RequestDealer;
 import org.rafko.aidertool.appdealer.services.DealerServer;
 
@@ -40,7 +39,7 @@ public class DealerDashboardController implements Initializable {
             dealerServer.start(50051);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Unable to start server!", e);
-        }
+       }
 
         /* Set factories fof the cells */
         stateColumn.setCellValueFactory(new PropertyValueFactory<>("state"));
