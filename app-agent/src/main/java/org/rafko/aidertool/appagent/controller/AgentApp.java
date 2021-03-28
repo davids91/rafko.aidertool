@@ -1,4 +1,5 @@
 package org.rafko.aidertool.appagent.controller;
+import org.rafko.aidertool.appagent.models.Stats;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.rafko.aidertool.appagent.models.Stats;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

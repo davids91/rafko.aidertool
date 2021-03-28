@@ -2,9 +2,6 @@
 
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -18,7 +15,7 @@
          <children>
             <MenuButton fx:id="menuButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0">
                <items>
-                  <MenuItem mnemonicParsing="false" onAction="#quitApp" text="Request help.." />
+                  <MenuItem fx:id="requestHelpBtn" onAction="#requestHelpDialog" disable="true" mnemonicParsing="false" text="Request help.." />
                   <MenuItem mnemonicParsing="false" onAction="#quitApp" text="Quit" />
                </items>
             </MenuButton>

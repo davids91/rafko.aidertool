@@ -1,11 +1,9 @@
 package org.rafko.aidertool.appagent.services;
 
-import io.grpc.StatusRuntimeException;
 import org.rafko.AiderTool.RequestDealer;
 import org.rafko.AiderTool.RequestHandlerGrpc;
 import io.grpc.Channel;
 
-import java.net.ConnectException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +24,7 @@ public class RequesterClient {
             if(RequestDealer.RequestState.STATE_REQUEST_OK ==  blockingCaller.ping(aidRq).getState())
                 return true;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE,"Unable to communicate with channel!", e);
+            LOGGER.log(Level.WARNING,"Unable to communicate with channel!", e);
         }
         return false;
     }

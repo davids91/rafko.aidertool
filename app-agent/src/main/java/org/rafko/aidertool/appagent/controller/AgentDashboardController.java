@@ -5,10 +5,14 @@ import io.grpc.ManagedChannelBuilder;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,14 +25,16 @@ import javafx.util.Duration;
 import org.rafko.aidertool.appagent.models.Stats;
 import org.rafko.aidertool.appagent.services.RequesterClient;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AgentDashboardController {
     private static final Logger LOGGER = Logger.getLogger(AgentDashboardController.class.getName());
-    private final Image notConnectedIcon = new Image("Img/not_connected.png");
-    private final Image connectedIcon = new Image("Img/connected.png");
+    private static final Image notConnectedIcon = new Image("Img/not_connected.png");
+    private static final Image connectedIcon = new Image("Img/connected.png");
+    @FXML MenuItem requestHelpBtn;
     @FXML ImageView statusIcon;
     @FXML HBox statusBar;
     @FXML MenuButton menuButton;
@@ -67,25 +73,13 @@ public class AgentDashboardController {
         ManagedChannel channel = ManagedChannelBuilder.forTarget(stats.getDealerAddress())
                 .usePlaintext().build(); /* TODO: use SSL/TLS */
         caller = new RequesterClient(channel, stats.getUserName());
-        connectionThread = new Thread(() -> {
-            while(isRunning()){
-                if (caller.testConnection()) {
-                    setConnected(true);
-                    setUIToConnected();
-                } else {
-                    setConnected(true);
-                    setUItoDisconnected();
-                }
-                try {
-                    if(isConnected()) Thread.sleep(30000);
-                    else Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    LOGGER.log(Level.WARNING,"Connection thread interrupted!");
-                }
-            }
-        });
-
+        connectionThread = new Thread(this::connectionToServer);
     }
+
+    public void sendHelpRequest(String... tags){
+        for(String tag : tags)System.out.println("HELP!" + tag);
+    }
+
     @FXML
     public void initialize() {
         userId.setText(stats.getUserName());
@@ -118,11 +112,37 @@ public class AgentDashboardController {
         connectionThread.start();
     }
 
+    private void connectionToServer(){
+        while(isRunning()){
+            if(isConnected()){
+                /* TODO: Query requests */
+                /* TODO: Filter query based on tags */
+                /* TODO: Update UI based on available requests */
+            }
+
+            if (caller.testConnection()) {
+                setConnected(true);
+                Platform.runLater(this::setUIToConnected);
+            } else {
+                setConnected(false);
+                Platform.runLater(this::setUItoDisconnected);
+            }
+            try {
+                if(isConnected()) Thread.sleep(30000);
+                else Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING,"Connection thread interrupted!");
+            }
+        }
+    }
+
     private void setUIToConnected(){
+        requestHelpBtn.setDisable(false);
         statusIcon.setImage(connectedIcon);
     }
 
     private void setUItoDisconnected(){
+        requestHelpBtn.setDisable(true);
         statusIcon.setImage(notConnectedIcon);
     }
 
@@ -179,5 +199,19 @@ public class AgentDashboardController {
         }
         Platform.exit();
         System.exit(0);
+    }
+
+    public void requestHelpDialog() {
+        try {
+            Stage tagTest = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/TagsEditor.fxml"));
+            loader.setControllerFactory(param -> new TagsEditorController(stats));
+            Parent root = loader.load();
+            Scene tagsScene = new Scene(root, 400, 200);
+            tagTest.setScene(tagsScene);
+            tagTest.show();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Unable to load Tags view!", e);
+        }
     }
 }
