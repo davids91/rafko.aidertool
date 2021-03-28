@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 public class TagsEditorController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(TagsEditorController.class.getName());
+    final double buttonIconSize = 30; /* 16 for the icon + some for the padding */
     private static final ImageView closeIcon = new ImageView(new Image("Img/close.png"));
 
     @FXML TextField tagsField;
@@ -49,14 +50,13 @@ public class TagsEditorController implements Initializable {
             tagsField.positionCaret(tagsField.getLength()-1);
         });
         tagsField.setOnKeyReleased(keyEvent -> {
-            String tagsFieldText = tagsField.getText();
+            String tagsFieldText = tagsField.getText().substring(0,Math.min(45,tagsField.getText().length()));
             if(
                 ((keyEvent.getCode() == KeyCode.SPACE)||(keyEvent.getCode() == KeyCode.BACK_SPACE))
                 &&(0 < tagsFieldText.trim().length()) /* If there is more in the text, than whitespace */
                 &&(tagsFieldText.lastIndexOf(" ") == tagsField.getText().length()-1) /* if the last character is space */
             ){
                 String[] tags = tagsFieldText.split("(?<!^) +");
-                StringBuilder tagsSummary = new StringBuilder();
                 if(
                     (keyEvent.getCode() == KeyCode.BACK_SPACE) /* Always recheck in case of backspace */
                     ||(tagList.size() != tags.length) /* If the number of tags changed */
@@ -64,31 +64,40 @@ public class TagsEditorController implements Initializable {
                     Platform.runLater(() -> {
                         tagsFlowPane.getChildren().clear();
                         for(String tag : tags){ /* Generate a button for every tag */
-                            double wordWidth = StringUtil.getStringWidth(tag, tagsField.getFont());
+                            final double wordWidth = StringUtil.getStringWidth(tag, tagsField.getFont());
                             Button btn = new Button(tag);
                             btn.setOnAction(event -> {});
                             btn.getStyleClass().add("tagBtn");
-                            btn.setPrefWidth(wordWidth + 25);
+                            btn.setPrefWidth(wordWidth + buttonIconSize);
                             btn.setOnAction(event -> {
-                                System.out.println("asdas");
+                                tagList.remove(tag);
+                                tagsFlowPane.getChildren().remove(btn);
+                                tagsField.setText(GenerateTextFromTags());
                                 tagsField.requestFocus();
                                 tagsField.positionCaret(tagsField.getLength()-1);
-                            }); /* TODO: set invisible, update caret, recheck normally or when too much characters typed */
+                            });
                             tagsFlowPane.getChildren().add(btn);
-                            tagsFlowPane.layout();
-                            double spacesNeeded = Math.max(0.0, /* TODO: use actual size of the button, instead of known prefWidth */
-                                    (wordWidth + 25 - wordWidth))/Math.max(1.0,StringUtil.getStringWidth(" ",tagsField.getFont())
-                            );
-                            tagsSummary.append(tag);
-                            for(int i=0; i < spacesNeeded; ++i) tagsSummary.append(" ");
+                            btn.layout();
                         }
                         tagList.clear();
                         tagList.addAll(Arrays.asList(tags));
-                        tagsField.setText(tagsSummary.toString());
+                        tagsField.setText(GenerateTextFromTags());
                         tagsField.positionCaret(tagsField.getLength()-1);
                     });
                 }
             }
         });
+    }
+
+    private String GenerateTextFromTags(){
+        StringBuilder tagsSummary = new StringBuilder();
+        for(String tag : tagList){ /* Generate the text for every tag */
+            double spacesNeeded = Math.max(0.0, /* TODO: use actual size of the button, instead of known prefWidth */
+                (buttonIconSize)/Math.max(1.0,StringUtil.getStringWidth(" ",tagsField.getFont()))
+            );
+            tagsSummary.append(tag);
+            for(int i=0; i < spacesNeeded; ++i) tagsSummary.append(" ");
+        }
+        return tagsSummary.toString();
     }
 }
