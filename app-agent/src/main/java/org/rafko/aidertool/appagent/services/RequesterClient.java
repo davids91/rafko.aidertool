@@ -1,7 +1,7 @@
 package org.rafko.aidertool.appagent.services;
 
-import org.rafko.AiderTool.RequestDealer;
-import org.rafko.AiderTool.RequestHandlerGrpc;
+import org.rafko.aidertool.RequestDealer;
+import org.rafko.aidertool.RequestHandlerGrpc;
 import io.grpc.Channel;
 
 import java.util.logging.Level;

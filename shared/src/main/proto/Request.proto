@@ -1,6 +1,6 @@
 
 syntax = "proto3";
-option java_package = "org.rafko.AiderTool";
+option java_package = "org.rafko.aidertool";
 option java_outer_classname = "RequestDealer";
 
 package AiderTool;
@@ -39,6 +39,7 @@ service RequestHandler{
 
   rpc queryRequest(AidToken) returns (AidToken);
   rpc queryRequests(AidToken) returns (stream AidToken);
+  rpc queryTags(AidToken) returns (AidToken); /* empty requestID means all tags */
 
   rpc initiate(AidToken) returns (AidToken);
   rpc finalize(AidToken) returns (AidToken);

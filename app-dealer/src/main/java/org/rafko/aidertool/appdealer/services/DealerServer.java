@@ -3,8 +3,9 @@ package org.rafko.aidertool.appdealer.services;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
-import org.rafko.AiderTool.RequestDealer;
-import org.rafko.AiderTool.RequestHandlerGrpc;
+import org.rafko.aidertool.RequestDealer;
+import org.rafko.aidertool.RequestHandlerGrpc;
+import org.rafko.aidertool.appdealer.models.DealerStats;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -13,11 +14,16 @@ import java.util.logging.Logger;
 
 public class DealerServer {
     private static final Logger LOGGER = Logger.getLogger(DealerServer.class.getName());
+    private final DealerStats stats;
     private Server server;
+
+    public DealerServer(DealerStats stats_){
+        stats = stats_;
+    }
 
     public void start(int port) throws IOException {
         server = ServerBuilder.forPort(port)
-                .addService(new RequestHandlerImpl())
+                .addService(new RequestHandlerImpl(stats))
                 .build()
                 .start();
         LOGGER.info("Server started, listening on " + port);
@@ -54,13 +60,20 @@ public class DealerServer {
     }
 
     private static class RequestHandlerImpl extends RequestHandlerGrpc.RequestHandlerImplBase {
+        private final DealerStats stats;
+        public RequestHandlerImpl(DealerStats stats_){
+            stats = stats_;
+        }
+
         @Override
         public void addRequest(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.INFO,"addRequest call received from : " + request.getRequesterUUID() + "!");
-            LOGGER.log(Level.INFO, "Tags of request:");
-            for(int i = 0; i<request.getTagsCount(); ++i){
-                LOGGER.log(Level.INFO,request.getTags(i));
-            }
+            for(String tag : request.getTagsList()) /* Add the requested tags into the stored ones */
+                if(!stats.getTagsProperty().contains(tag)){
+                    stats.getTagsProperty().add(tag);
+                    System.out.println("Adding tag: " + tag);
+                }
+            /* TODO: Store request */
             responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestState.STATE_REQUEST_OK).build());
             responseObserver.onCompleted();
         }
@@ -78,6 +91,16 @@ public class DealerServer {
         @Override
         public void queryRequests(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.INFO,"queryRequests call received!");
+        }
+
+        @Override
+        public void queryTags(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
+            LOGGER.log(Level.INFO,"Providing tags to: " + request.getUserUUID());
+            RequestDealer.AidToken tagsContainer = RequestDealer.AidToken.newBuilder()
+                    .addAllTags(stats.getTagsProperty())
+                    .build();
+            responseObserver.onNext(tagsContainer);
+            responseObserver.onCompleted();
         }
 
         @Override

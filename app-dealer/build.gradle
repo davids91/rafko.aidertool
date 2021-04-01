@@ -26,7 +26,7 @@ dependencies {
 
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
     implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
-    compile project(':shared-protocol')
+    compile project(':shared')
 }
 
 application {

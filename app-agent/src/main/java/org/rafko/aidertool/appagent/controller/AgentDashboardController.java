@@ -5,7 +5,6 @@ import io.grpc.ManagedChannelBuilder;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
@@ -22,14 +21,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.rafko.AiderTool.RequestDealer;
-import org.rafko.aidertool.appagent.models.Stats;
+import org.rafko.aidertool.RequestDealer;
+import org.rafko.aidertool.appagent.models.AgentStats;
 import org.rafko.aidertool.appagent.services.RequesterClient;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,11 +43,11 @@ public class AgentDashboardController {
     @FXML Label userId;
 
     private final Stage primaryStage;
-    private double yOffset = 0;
-    private boolean hideStage = false;
     private final Thread connectionThread;
     private final RequesterClient caller;
-    private final Stats stats;
+    private final AgentStats agentStats;
+    private double yOffset = 0;
+    private boolean hideStage = false;
     private boolean running = true;
     private boolean connected = false;
 
@@ -71,19 +67,19 @@ public class AgentDashboardController {
         running = false;
     }
 
-    public AgentDashboardController(Stage parent_, Stats stats_){
-        stats = stats_;
+    public AgentDashboardController(Stage parent_, AgentStats agentStats_){
+        agentStats = agentStats_;
         primaryStage = parent_;
-        ManagedChannel channel = ManagedChannelBuilder.forTarget(stats.getDealerAddress())
+        ManagedChannel channel = ManagedChannelBuilder.forTarget(agentStats.getDealerAddress())
                 .usePlaintext().build(); /* TODO: use SSL/TLS */
-        caller = new RequesterClient(channel, stats.getUserName());
+        caller = new RequesterClient(channel, agentStats.getUserName());
         connectionThread = new Thread(this::connectionToServer);
     }
 
     public void sendHelpRequest(List<String> tags){
         if(isConnected()){ /* TODO: Handle communication in an async way */
             RequestDealer.AidRequest request = RequestDealer.AidRequest.newBuilder()
-                    .addAllTags(tags).setRequesterUUID(stats.getUserName())
+                    .addAllTags(tags).setRequesterUUID(agentStats.getUserName())
                     .build();
             if(RequestDealer.RequestState.STATE_REQUEST_OK ==
             caller.addRequest(request)/* TODO: process accepted / denied requests */
@@ -93,7 +89,8 @@ public class AgentDashboardController {
 
     @FXML
     public void initialize() {
-        userId.setText(stats.getUserName());
+        /* UI related initialization */
+        userId.setText(agentStats.getUserName());
         moveButton.setOnMousePressed(event -> yOffset = event.getSceneY());
         moveButton.setOnMouseDragged(event -> primaryStage.setY(event.getScreenY() - yOffset));
 
@@ -120,12 +117,16 @@ public class AgentDashboardController {
                 Platform.runLater(new Timeline(delayHideKf, hideKf)::play);
             }
         );
+
+        /* server connection */
         connectionThread.start();
+
     }
 
     private void connectionToServer(){
         while(isRunning()){
             if(isConnected()){
+                /* TODO: Query available tags */
                 /* TODO: Query requests */
                 /* TODO: Filter query based on tags */
                 /* TODO: Update UI based on available requests */
@@ -144,6 +145,12 @@ public class AgentDashboardController {
             } catch (InterruptedException e) {
                 LOGGER.log(Level.WARNING,"Connection thread interrupted!");
             }
+        }
+    }
+
+    private void getTagsFromDealer(){
+        if(isConnected()){
+
         }
     }
 
@@ -216,7 +223,7 @@ public class AgentDashboardController {
         try {
             Stage tagTest = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/TagsEditor.fxml"));
-            loader.setControllerFactory(param -> new TagsEditorController(stats, this::sendHelpRequest));
+            loader.setControllerFactory(param -> new TagsEditorController(agentStats, this::sendHelpRequest));
             Parent root = loader.load();
             Scene tagsScene = new Scene(root, 400, 200);
             tagTest.setScene(tagsScene);

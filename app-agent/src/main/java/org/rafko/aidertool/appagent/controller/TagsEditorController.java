@@ -13,7 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
-import org.rafko.aidertool.appagent.models.Stats;
+import org.rafko.aidertool.appagent.models.AgentStats;
 import org.rafko.aidertool.appagent.services.StringUtil;
 
 import java.net.URL;
@@ -33,16 +33,16 @@ public class TagsEditorController implements Initializable {
     private final Consumer<List<String>> finalizeMethod;
     private final ArrayList<String> typedTagsList = new ArrayList<>();
     private final FilteredList<String> displayedTags;
-    private final Stats stats;
+    private final AgentStats agentStats;
 
     @FXML ListView<String> tagsListView;
     @FXML TextField tagsField;
     @FXML FlowPane tagsFlowPane;
 
-    public TagsEditorController(Stats stats_, Consumer<List<String>> finalizeMethod_){
-        stats = stats_;
+    public TagsEditorController(AgentStats agentStats_, Consumer<List<String>> finalizeMethod_){
+        agentStats = agentStats_;
         finalizeMethod = finalizeMethod_;
-        displayedTags = new FilteredList<>(FXCollections.observableList(stats.getTags()));
+        displayedTags = new FilteredList<>(FXCollections.observableList(agentStats.getTagsProperty()));
         closeIcon.setFitWidth(16);
         closeIcon.setFitHeight(16);
     }

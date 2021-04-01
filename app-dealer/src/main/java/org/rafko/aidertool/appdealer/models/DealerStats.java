@@ -1,12 +1,13 @@
 package org.rafko.aidertool.appdealer.models;
 
 import org.rafko.aidertool.appdealer.services.NetUtil;
+import org.rafko.aidertool.shared.models.Stats;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Stats {
-    private static final Logger LOGGER = Logger.getLogger(Stats.class.getName());
+public class DealerStats extends Stats {
+    private static final Logger LOGGER = Logger.getLogger(DealerStats.class.getName());
     public enum ContentDefinition{
         LAN_IP, WAN_IP, CONTENTS_SIZE;
         private static final ContentDefinition[] valuesArr = values();
@@ -15,7 +16,7 @@ public class Stats {
     };
     private final String[] contents;
 
-    public Stats() {
+    public DealerStats() {
         contents = new String[ContentDefinition.CONTENTS_SIZE.ordinal()];
         contents[ContentDefinition.LAN_IP.ordinal()] = NetUtil.getLANIP();
         contents[ContentDefinition.WAN_IP.ordinal()] = NetUtil.getWANIP();

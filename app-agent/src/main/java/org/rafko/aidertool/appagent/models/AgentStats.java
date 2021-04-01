@@ -1,15 +1,14 @@
 package org.rafko.aidertool.appagent.models;
 
+import org.rafko.aidertool.shared.models.Stats;
+
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Stats {
-    private static final Logger LOGGER = Logger.getLogger(Stats.class.getName());
+public class AgentStats extends Stats {
+    private static final Logger LOGGER = Logger.getLogger(AgentStats.class.getName());
     private final String userName = userName();
-    private final ArrayList<String> tags = new ArrayList<>();
     private String dealerAddress = "localhost:50051";
 
     private String userName(){
@@ -33,18 +32,5 @@ public class Stats {
 
     public void setDealerAddress(String dealerAddress) {
         this.dealerAddress = dealerAddress;
-    }
-
-    public void setTags(String... tags_){
-        tags.clear();
-        addTags(tags_);
-    }
-
-    public void addTags(String... tags_){
-        tags.addAll(Arrays.asList(tags_));
-    }
-
-    public ArrayList<String> getTags(){
-        return tags;
     }
 }
