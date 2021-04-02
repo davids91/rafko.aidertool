@@ -39,7 +39,7 @@ service RequestHandler{
 
   rpc queryRequest(AidToken) returns (AidToken);
   rpc queryRequests(AidToken) returns (stream AidToken);
-  rpc queryTags(AidToken) returns (AidToken); /* empty requestID means all tags */
+  rpc queryTags(AidToken) returns (AidToken); /* empty tags field means all tags *//* TODO filter for tags */
 
   rpc initiate(AidToken) returns (AidToken);
   rpc finalize(AidToken) returns (AidToken);

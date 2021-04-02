@@ -1,6 +1,8 @@
 package org.rafko.aidertool.appagent.controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -33,6 +35,7 @@ public class TagsEditorController implements Initializable {
     private final Consumer<List<String>> finalizeMethod;
     private final ArrayList<String> typedTagsList = new ArrayList<>();
     private final FilteredList<String> displayedTags;
+    private final ListProperty<String> displayedTagsProperty;
     private final AgentStats agentStats;
 
     @FXML ListView<String> tagsListView;
@@ -43,6 +46,7 @@ public class TagsEditorController implements Initializable {
         agentStats = agentStats_;
         finalizeMethod = finalizeMethod_;
         displayedTags = new FilteredList<>(FXCollections.observableList(agentStats.getTagsProperty()));
+        displayedTagsProperty = new SimpleListProperty<>(displayedTags);
         closeIcon.setFitWidth(16);
         closeIcon.setFitHeight(16);
     }
@@ -50,9 +54,7 @@ public class TagsEditorController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         /* Initialize available tags listview */
-        displayedTags.predicateProperty().addListener((observable, oldValue, newValue) -> {
-            tagsListView.setItems(displayedTags);
-        });
+        tagsListView.itemsProperty().bind(displayedTagsProperty);
         tagsField.textProperty().addListener((observable, oldValue, newValue) -> {
             String[] tags = newValue.split(tagsRegex);
             if((0 < tags.length)&&(!typedTagsList.contains(tags[tags.length-1])))

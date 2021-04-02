@@ -1,5 +1,6 @@
 package org.rafko.aidertool.appagent.services;
 
+import javafx.beans.property.ListProperty;
 import org.rafko.aidertool.RequestDealer;
 import org.rafko.aidertool.RequestHandlerGrpc;
 import io.grpc.Channel;
@@ -31,5 +32,13 @@ public class RequesterClient {
 
     public RequestDealer.AidToken addRequest(RequestDealer.AidRequest request){
         return blockingCaller.addRequest(request);
+    }
+
+    public void updateTags(ListProperty<String> currentTags){
+        RequestDealer.AidToken response = blockingCaller.queryTags(RequestDealer.AidToken.newBuilder().build());
+        for(String tag : response.getTagsList()){
+            if(!currentTags.contains(tag))
+                currentTags.add(tag);
+        }
     }
 }

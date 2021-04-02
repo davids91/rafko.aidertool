@@ -44,6 +44,7 @@ public class AgentDashboardController {
 
     private final Stage primaryStage;
     private final Thread connectionThread;
+    private final Thread syncThread;
     private final RequesterClient caller;
     private final AgentStats agentStats;
     private double yOffset = 0;
@@ -73,7 +74,8 @@ public class AgentDashboardController {
         ManagedChannel channel = ManagedChannelBuilder.forTarget(agentStats.getDealerAddress())
                 .usePlaintext().build(); /* TODO: use SSL/TLS */
         caller = new RequesterClient(channel, agentStats.getUserName());
-        connectionThread = new Thread(this::connectionToServer);
+        connectionThread = new Thread(this::checkConnection);
+        syncThread = new Thread(this::sync);
     }
 
     public void sendHelpRequest(List<String> tags){
@@ -120,18 +122,23 @@ public class AgentDashboardController {
 
         /* server connection */
         connectionThread.start();
-
+        syncThread.start();
     }
 
-    private void connectionToServer(){
-        while(isRunning()){
-            if(isConnected()){
-                /* TODO: Query available tags */
+    private void sync(){
+        while(isRunning()) {
+            if (isConnected()) {
+                caller.updateTags(agentStats.getTagsProperty());
                 /* TODO: Query requests */
                 /* TODO: Filter query based on tags */
                 /* TODO: Update UI based on available requests */
+                pauseThread();
             }
+        }
+    }
 
+    private void checkConnection(){
+        while(isRunning()){
             if (caller.testConnection()) {
                 setConnected(true);
                 Platform.runLater(this::setUIToConnected);
@@ -139,18 +146,16 @@ public class AgentDashboardController {
                 setConnected(false);
                 Platform.runLater(this::setUItoDisconnected);
             }
-            try {
-                if(isConnected()) Thread.sleep(30000);
-                else Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING,"Connection thread interrupted!");
-            }
+            pauseThread();
         }
     }
 
-    private void getTagsFromDealer(){
-        if(isConnected()){
-
+    private void pauseThread(){
+        try {
+            if(isConnected()) Thread.sleep(30000);
+            else Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING,"Connection thread interrupted!");
         }
     }
 

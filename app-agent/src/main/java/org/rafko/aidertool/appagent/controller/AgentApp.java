@@ -8,10 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.rafko.aidertool.shared.models.Stats;
 import org.rafko.aidertool.shared.services.LogUtil;
 
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

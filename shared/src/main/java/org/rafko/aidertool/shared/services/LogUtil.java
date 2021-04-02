@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class LogUtil {
     private static final Logger LOGGER = Logger.getLogger(LogUtil.class.getName());
-    public static final File tagsFile = new File("tags.prt");
+    public static final File tagsFile = new File("tags.protobin");
     public static void readTags(ListProperty<String> tagsContainer){
         try { /* Read in tags locally if possible */
             if(tagsFile.exists()||tagsFile.createNewFile()){
