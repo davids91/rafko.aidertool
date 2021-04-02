@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="rootVBox" alignment="CENTER_LEFT" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.rafko.aidertool.appagent.controller.AgentDashboardController">
+<AnchorPane fx:id="rootPanel" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.rafko.aidertool.appagent.controller.AgentDashboardController">
    <children>
-      <Label fx:id="userId" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: yellow;" text="uids">
-         <font>
-            <Font name="System Bold" size="15.0" />
-         </font></Label>
-      <HBox fx:id="statusBar" alignment="CENTER_RIGHT">
+      <Pane id="background" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <VBox fx:id="rootVBox" alignment="CENTER_LEFT" spacing="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <MenuButton fx:id="menuButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0">
-               <items>
-                  <MenuItem fx:id="requestHelpBtn" onAction="#requestHelpDialog" disable="true" mnemonicParsing="false" text="Request help.." />
-                  <MenuItem mnemonicParsing="false" onAction="#quitApp" text="Quit" />
-               </items>
-            </MenuButton>
-            <Button fx:id="moveButton" mnemonicParsing="false" prefHeight="30.0" text="↕">
-               <graphic>
-                  <ImageView fx:id="statusIcon" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../Img/not_connected.png" />
-                     </image>
-                  </ImageView>
-               </graphic></Button>
+            <Label fx:id="userId" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: yellow;" text="uids">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font></Label>
+            <HBox fx:id="statusBar" alignment="CENTER_RIGHT">
+               <children>
+                  <MenuButton fx:id="menuButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0">
+                     <items>
+                        <MenuItem fx:id="requestHelpBtn" disable="true" mnemonicParsing="false" onAction="#requestHelpDialog" text="Request help.." />
+                        <MenuItem mnemonicParsing="false" onAction="#quitApp" text="Quit" />
+                     </items>
+                  </MenuButton>
+                  <Button fx:id="moveButton" mnemonicParsing="false" prefHeight="30.0" text="↕">
+                     <graphic>
+                        <ImageView fx:id="statusIcon" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../Img/not_connected.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></Button>
+               </children>
+            </HBox>
          </children>
-      </HBox>
+      </VBox>
    </children>
-</VBox>
+</AnchorPane>

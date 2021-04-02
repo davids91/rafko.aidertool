@@ -3,8 +3,10 @@ package org.rafko.aidertool.appagent.controller;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.value.WritableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
@@ -16,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
@@ -34,6 +37,7 @@ public class AgentDashboardController {
     private static final Logger LOGGER = Logger.getLogger(AgentDashboardController.class.getName());
     private static final Image notConnectedIcon = new Image("Img/not_connected.png");
     private static final Image connectedIcon = new Image("Img/connected.png");
+    @FXML AnchorPane rootPanel;
     @FXML MenuItem requestHelpBtn;
     @FXML ImageView statusIcon;
     @FXML HBox statusBar;
@@ -85,7 +89,7 @@ public class AgentDashboardController {
                     .build();
             if(RequestDealer.RequestState.STATE_REQUEST_OK ==
             caller.addRequest(request)/* TODO: process accepted / denied requests */
-            .getState())System.out.println("SUCESS!");
+            .getState())System.out.println("SUCCESS!");
         }else LOGGER.log(Level.SEVERE,"Unable to request help, no recipient found..");
     }
 
@@ -104,14 +108,14 @@ public class AgentDashboardController {
 
         /* Create hover functionalities */
         hideStage();
-        rootVBox.addEventFilter(
+        rootPanel.addEventFilter(
             MouseEvent.MOUSE_ENTERED,
             event -> {
                 hideStage = false;
                 showStage();
             }
         );
-        rootVBox.addEventFilter(
+        rootPanel.addEventFilter(
             MouseEvent.MOUSE_EXITED,
             event -> {
                 final KeyFrame delayHideKf = new KeyFrame(Duration.ZERO, e -> hideStage = true);
@@ -123,6 +127,9 @@ public class AgentDashboardController {
         /* server connection */
         connectionThread.start();
         syncThread.start();
+
+        /* contract the stage */
+        hideStage();
     }
 
     private void sync(){
@@ -169,26 +176,43 @@ public class AgentDashboardController {
         statusIcon.setImage(notConnectedIcon);
     }
 
-    private void hideStage(){
-        rootVBox.setAlignment(Pos.CENTER_LEFT);
-        statusBar.setAlignment(Pos.CENTER_RIGHT);
-        userId.setVisible(false);
-        Platform.runLater(() -> {
-            menuButton.setPrefWidth(0.0);
-            primaryStage.setWidth(30);
+    WritableValue<Double> writableStageWidth = new WritableValue<Double>() {
+        @Override
+        public Double getValue() {
+            return primaryStage.getWidth();
+        }
+
+        @Override
+        public void setValue(Double value) {
+            primaryStage.setWidth(value);
             primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth()));
-        });
+        }
+    };
+
+    private void hideStage(){
+        Platform.runLater(
+            new Timeline(
+                new KeyFrame(Duration.ZERO,event -> {
+                    rootVBox.setAlignment(Pos.CENTER_LEFT);
+                    statusBar.setAlignment(Pos.CENTER_RIGHT);
+                    userId.setVisible(false);
+                    menuButton.setPrefWidth(0.0);
+                }),
+                new KeyFrame(Duration.millis(300),new KeyValue(writableStageWidth, 30.0))
+            )::play
+        );
     }
 
     private void showStage(){
-        rootVBox.setAlignment(Pos.CENTER_RIGHT);
-        statusBar.setAlignment(Pos.CENTER_RIGHT);
-        userId.setVisible(true);
-        Platform.runLater(() -> {
-            menuButton.setPrefWidth(MenuButton.USE_COMPUTED_SIZE);
-            primaryStage.setWidth(300);
-            primaryStage.setX(Screen.getPrimary().getBounds().getWidth()-(primaryStage.getWidth()));
-        });
+        Platform.runLater(new Timeline( /* TODO: Use maximum size of request buttons */
+            new KeyFrame(Duration.ZERO,event -> {
+                rootVBox.setAlignment(Pos.CENTER_RIGHT);
+                statusBar.setAlignment(Pos.CENTER_RIGHT);
+                userId.setVisible(true);
+                menuButton.setPrefWidth(MenuButton.USE_COMPUTED_SIZE);
+            }),
+            new KeyFrame(Duration.millis(50),new KeyValue(writableStageWidth, 300.0))
+        )::play);
     }
 
     private SplitMenuButton createButtonForAidRequests(String... tags){
@@ -205,11 +229,8 @@ public class AgentDashboardController {
         button.setPopupSide(Side.LEFT);
         button.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         button.setMaxSize(250,30);
-        button.setOnMouseEntered(event -> {
-            Platform.runLater(new Timeline(new KeyFrame(Duration.millis(20), e -> hideStage = false))::play);
-            button.setPrefSize((9 * stringBuilder.length()),30);
-        });
-        button.setOnMouseExited(event -> {button.setPrefSize(0,30);});
+        button.setOnMouseEntered(event -> button.setPrefSize((9 * stringBuilder.length()),30));
+        button.setOnMouseExited(event -> button.setPrefSize(0,30));
         return button;
     }
 

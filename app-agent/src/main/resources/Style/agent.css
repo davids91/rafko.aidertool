@@ -1,1 +1,6 @@
 .hoverable{}
+
+#background{
+  -fx-background-color: rgba(200, 100, 10, 0.3);
+  -fx-background-radius: 250 0 0 100;
+}
