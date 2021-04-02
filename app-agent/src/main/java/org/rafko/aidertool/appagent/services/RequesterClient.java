@@ -22,8 +22,8 @@ public class RequesterClient {
 
     public boolean testConnection(){
         RequestDealer.AidRequest aidRq = RequestDealer.AidRequest.newBuilder()
-                .setRequesterUUID(userID)
-                .build();
+        .setRequesterUUID(userID)
+        .build();
         try{
             if(RequestDealer.RequestState.STATE_REQUEST_OK ==  blockingCaller.ping(aidRq).getState())
                 return true;
@@ -34,7 +34,7 @@ public class RequesterClient {
     }
 
     public RequestDealer.AidToken addRequest(RequestDealer.AidRequest request){
-        return blockingCaller.addRequest(request);
+        return blockingCaller.add(request);
     }
 
     public void updateTags(ListProperty<String> currentTags){

@@ -1,12 +1,11 @@
 package org.rafko.aidertool.appdealer.controller;
 
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import org.rafko.aidertool.RequestDealer;
 import org.rafko.aidertool.appdealer.models.DealerStats;
+import org.rafko.aidertool.appdealer.models.RequestStateTableCell;
 import org.rafko.aidertool.appdealer.services.DealerServer;
 
 import javafx.fxml.FXML;
@@ -40,13 +39,13 @@ public class DealerDashboardController implements Initializable {
         /* Initialize Tags UI */
         knownTagsList.itemsProperty().bind(stats.getTagsProperty());
 
-        /* Initialize Requests UI */ /* TODO: Edit requests */
+        /* Initialize Requests UI */
         requestsTable.widthProperty().addListener((observable, oldValue, newValue) -> {
             stateColumn.setPrefWidth(newValue.doubleValue()/3.0);
             requesterColumn.setPrefWidth(newValue.doubleValue()/3.0);
             tagsColumn.setPrefWidth(newValue.doubleValue()/2.0);
         });
-        stateColumn.setCellValueFactory(new PropertyValueFactory<>("state"));
+        stateColumn.setCellValueFactory(param -> new Text(param.getValue().getState().toString()).textProperty());
         requesterColumn.setCellValueFactory(new PropertyValueFactory<>("requesterUUID"));
         tagsColumn.setCellValueFactory(param -> {
             StringBuilder tagsString = new StringBuilder();
@@ -57,6 +56,10 @@ public class DealerDashboardController implements Initializable {
         });
         requestsTable.itemsProperty().bind(dealerServer.getRequests());
 
+        /* Context menu for Requests */
+        stateColumn.setCellFactory(tableColumn -> new RequestStateTableCell(dealerServer.getRequests()));
+
+        /* Try to start the Dealer Server */
         try { dealerServer.start(50051); }
         catch (IOException e) { LOGGER.log(Level.SEVERE, "Unable to start server!", e); }
     }
