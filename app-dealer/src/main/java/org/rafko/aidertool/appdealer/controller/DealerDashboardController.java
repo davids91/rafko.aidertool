@@ -40,7 +40,7 @@ public class DealerDashboardController implements Initializable {
         /* Initialize Tags UI */
         knownTagsList.itemsProperty().bind(stats.getTagsProperty());
 
-        /* Initialize Requests UI */
+        /* Initialize Requests UI */ /* TODO: Edit requests */
         requestsTable.widthProperty().addListener((observable, oldValue, newValue) -> {
             stateColumn.setPrefWidth(newValue.doubleValue()/3.0);
             requesterColumn.setPrefWidth(newValue.doubleValue()/3.0);

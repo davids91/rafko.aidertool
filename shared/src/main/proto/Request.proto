@@ -6,26 +6,31 @@ option java_outer_classname = "RequestDealer";
 package AiderTool;
 
 enum RequestState{
-  STATE_UNKNOWN = 0;
-  STATE_INVALID = 1;
-  STATE_REQUEST_REJECTED = 2;
-  STATE_REQUEST_OK = 3;
-  STATE_OPEN = 10;
-  STATE_WAITING = 11;
-  STATE_ACTIVE = 12;
-  STATE_PENDING = 13;
-  STATE_FINISHED = 20;
-  STATE_CANCELLED = 21;
+  STATE_UNKNOWN = 0; /* Request in undefined state */
+  STATE_INVALID = 1; /* Request knowingly invalid */
+  STATE_REQUEST_REJECTED = 2; /* Request rejected */
+  STATE_REQUEST_OK = 3; /* Request accepted */
+  STATE_OPEN = 10; /* Request awaits helpers */
+  STATE_POSTPONED = 11; /* Request either de-prioritized by requester, or tentatively accepted by a helper */
+  STATE_ACTIVE = 12; /* Request is actively being worked on */
+  STATE_PENDING = 14; /* Request marked finished either by the requester or a helper */
+  STATE_FINISHED = 20; /* Request finished */
+  STATE_CANCELLED = 21; /* Request cancelled by requester */
 }
 
+/**
+ * Contains a request for help, complete with a unique ID and some tags
+ */
 message AidRequest{
-  string requesterUUID = 1;
+  string requestID = 1;
+  string requesterUUID = 2;
+  string lastStateInitiatedBy = 3;
   RequestState state = 10;
   repeated string tags = 11;
 }
 
 message AidToken{
-  uint32 requestID = 1;
+  string requestID = 1;
   string UserUUID = 2;
   RequestState state = 10;
   repeated string tags = 11;
@@ -33,14 +38,14 @@ message AidToken{
 }
 
 service RequestHandler{
-  rpc ping(AidRequest) returns (AidToken);
-  rpc addRequest(AidRequest) returns (AidToken);
-  rpc cancelRequest(AidRequest) returns (AidToken);
-
-  rpc queryRequest(AidToken) returns (AidToken);
-  rpc queryRequests(AidToken) returns (stream AidRequest);
-  rpc queryTags(AidToken) returns (AidToken); /* empty tags field means all tags *//* TODO filter for tags */
-
+  rpc add(AidRequest) returns (AidToken);
+  rpc cancel(AidRequest) returns (AidToken);
+  rpc postpone(AidToken) returns (AidToken);
   rpc initiate(AidToken) returns (AidToken);
   rpc finalize(AidToken) returns (AidToken);
+
+  rpc ping(AidRequest) returns (AidToken);
+  rpc queryRequest(AidToken) returns (AidToken);
+  rpc queryRequests(AidToken) returns (stream AidRequest);
+  rpc queryTags(AidToken) returns (AidToken); /* empty tags field means all tags */
 }

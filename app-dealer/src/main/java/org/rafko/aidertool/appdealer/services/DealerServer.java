@@ -12,6 +12,7 @@ import org.rafko.aidertool.appdealer.models.DealerStats;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +68,7 @@ public class DealerServer {
 
     private class RequestHandlerImpl extends RequestHandlerGrpc.RequestHandlerImplBase {
         @Override
-        public void addRequest(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
+        public void add(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
             if(!request.getRequesterUUID().isEmpty()) {
                 LOGGER.log(Level.INFO, "addRequest call received from : " + request.getRequesterUUID() + "!");
                 for (String tag : request.getTagsList()) { /* Add the requested tags into the stored ones */
@@ -79,6 +80,7 @@ public class DealerServer {
                 requests.add(
                     RequestDealer.AidRequest.newBuilder(request)
                     .setState(RequestDealer.RequestState.STATE_OPEN)
+                    .setRequestID(UUID.randomUUID().toString())
                     .build()
                 );
                 responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestState.STATE_REQUEST_OK).build());
@@ -90,19 +92,19 @@ public class DealerServer {
         }
 
         @Override
-        public void cancelRequest(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"addRequest call received from : " + request.getRequesterUUID() + "!");
+        public void cancel(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
+            LOGGER.log(Level.INFO,"cancel request call received from : " + request.getRequesterUUID() + "!");
         }
 
         @Override
         public void queryRequest(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"cancelRequest call received from : " + request.getUserUUID() + "!");
+            LOGGER.log(Level.INFO,"queryRequest call received from : " + request.getUserUUID() + "!");
         }
 
         @Override
         public void queryRequests(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidRequest> responseObserver) {
             LOGGER.log(Level.INFO,"queryRequests call received from : " + request.getUserUUID() + "!");
-            for(RequestDealer.AidRequest storedRequest : requests){
+            for(RequestDealer.AidRequest storedRequest : requests){ /* TODO filter for tags */
                 StringBuilder tagsSummary = new StringBuilder();
                 for(String tag : storedRequest.getTagsList()) tagsSummary.append(tag).append(", ");
                 LOGGER.log(Level.INFO,"Providing request[of "+ storedRequest.getRequesterUUID() + "] with tags: " + tagsSummary.toString());
