@@ -73,7 +73,7 @@ public class DealerServer {
                 for (String tag : request.getTagsList()) { /* Add the requested tags into the stored ones */
                     if (!stats.getTagsProperty().contains(tag)) {
                         stats.getTagsProperty().add(tag);
-                        System.out.println("Adding tag: " + tag);
+                        LOGGER.log(Level.INFO,"Adding tag: " + tag);
                     }
                 }
                 requests.add(
@@ -91,25 +91,32 @@ public class DealerServer {
 
         @Override
         public void cancelRequest(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"addRequest call received!");
+            LOGGER.log(Level.INFO,"addRequest call received from : " + request.getRequesterUUID() + "!");
         }
 
         @Override
         public void queryRequest(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"cancelRequest call received!");
+            LOGGER.log(Level.INFO,"cancelRequest call received from : " + request.getUserUUID() + "!");
         }
 
         @Override
-        public void queryRequests(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"queryRequests call received!");
+        public void queryRequests(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidRequest> responseObserver) {
+            LOGGER.log(Level.INFO,"queryRequests call received from : " + request.getUserUUID() + "!");
+            for(RequestDealer.AidRequest storedRequest : requests){
+                StringBuilder tagsSummary = new StringBuilder();
+                for(String tag : storedRequest.getTagsList()) tagsSummary.append(tag).append(", ");
+                LOGGER.log(Level.INFO,"Providing request[of "+ storedRequest.getRequesterUUID() + "] with tags: " + tagsSummary.toString());
+                responseObserver.onNext(storedRequest);
+            }
+            responseObserver.onCompleted();
         }
 
         @Override
         public void queryTags(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.INFO,"Providing tags to: " + request.getUserUUID());
             RequestDealer.AidToken tagsContainer = RequestDealer.AidToken.newBuilder()
-                    .addAllTags(stats.getTagsProperty())
-                    .build();
+            .addAllTags(stats.getTagsProperty())
+            .build();
             responseObserver.onNext(tagsContainer);
             responseObserver.onCompleted();
         }

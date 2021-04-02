@@ -6,12 +6,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.WritableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -29,9 +34,12 @@ import org.rafko.aidertool.appagent.models.AgentStats;
 import org.rafko.aidertool.appagent.services.RequesterClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Node;
 
 public class AgentDashboardController {
     private static final Logger LOGGER = Logger.getLogger(AgentDashboardController.class.getName());
@@ -51,30 +59,16 @@ public class AgentDashboardController {
     private final Thread syncThread;
     private final RequesterClient caller;
     private final AgentStats agentStats;
+    private final ListProperty<RequestDealer.AidRequest> requests;
     private double yOffset = 0;
     private boolean hideStage = false;
     private boolean running = true;
     private boolean connected = false;
 
-    private synchronized boolean isConnected(){
-        return connected;
-    }
-
-    private synchronized boolean isRunning(){
-        return running;
-    }
-
-    private synchronized void setConnected(boolean newValue){
-        connected = newValue;
-    }
-
-    private synchronized void stopRunning(){
-        running = false;
-    }
-
     public AgentDashboardController(Stage parent_, AgentStats agentStats_){
         agentStats = agentStats_;
         primaryStage = parent_;
+        requests = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
         ManagedChannel channel = ManagedChannelBuilder.forTarget(agentStats.getDealerAddress())
                 .usePlaintext().build(); /* TODO: use SSL/TLS */
         caller = new RequesterClient(channel, agentStats.getUserName());
@@ -87,9 +81,10 @@ public class AgentDashboardController {
             RequestDealer.AidRequest request = RequestDealer.AidRequest.newBuilder()
                     .addAllTags(tags).setRequesterUUID(agentStats.getUserName())
                     .build();
-            if(RequestDealer.RequestState.STATE_REQUEST_OK ==
-            caller.addRequest(request)/* TODO: process accepted / denied requests */
-            .getState())System.out.println("SUCCESS!");
+            if(RequestDealer.RequestState.STATE_REQUEST_OK == caller.addRequest(request).getState())
+                System.out.println("SUCCESS!");
+            trySync();
+
         }else LOGGER.log(Level.SEVERE,"Unable to request help, no recipient found..");
     }
 
@@ -100,11 +95,22 @@ public class AgentDashboardController {
         moveButton.setOnMousePressed(event -> yOffset = event.getSceneY());
         moveButton.setOnMouseDragged(event -> primaryStage.setY(event.getScreenY() - yOffset));
 
-        /* Generate mockup buttons */
-        for(int i = 0; i < 5; ++i){
-            /* create SplitMenuButton */
-            rootVBox.getChildren().add(createButtonForAidRequests("EVC", "SDH", "C", "VehISP"));
-        }
+        /* Set queried requests list changeListener */
+        /*rootVBox.getChildren().add(createButtonForAidRequests());*/
+        requests.addListener((ListChangeListener<? super RequestDealer.AidRequest>) change -> {
+            System.out.println("changes:");
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for(RequestDealer.AidRequest request : change.getAddedSubList()){
+                        Platform.runLater(()->rootVBox.getChildren().add(createButtonForAidRequest(request)));
+                    }
+                }else{
+                    Platform.runLater(()->rootVBox.getChildren().removeIf(node ->
+                        (null != node.getUserData()) && (change.getRemoved().contains((RequestDealer.AidRequest)node.getUserData()))
+                    ));
+                }
+            }
+        });
 
         /* Create hover functionalities */
         hideStage();
@@ -143,8 +149,22 @@ public class AgentDashboardController {
 
     private void trySync(){
         if (isConnected()) {
-            caller.updateTags(agentStats.getTagsProperty());
-            /* TODO: Query requests */
+            caller.updateTags(agentStats.getTagsProperty()); /* Query tags */
+            ArrayList<RequestDealer.AidRequest> queriedRequests = caller.getRequests();
+            ArrayList<RequestDealer.AidRequest> requestsToRemove = new ArrayList<>();
+            for(RequestDealer.AidRequest request : queriedRequests){ /* Query Actual requests */
+                if(!requests.contains(request)){ /* Add the new requests to the locally stored list */
+                    requests.add(request);
+                }
+            }
+            for(RequestDealer.AidRequest request : requests){ /* Update local requests */
+                if(!queriedRequests.contains(request)){ /* Mark every request not contained in the new list to be removed */
+                    requestsToRemove.add(request);
+                }
+            }
+            for(RequestDealer.AidRequest request : requestsToRemove)
+                requests.remove(request); /* Remove marked requests */
+
             /* TODO: Filter query based on tags */
             /* TODO: Update UI based on available requests */
         }
@@ -225,16 +245,13 @@ public class AgentDashboardController {
         )::play);
     }
 
-    private SplitMenuButton createButtonForAidRequests(String... tags){
+    private SplitMenuButton createButtonForAidRequest(RequestDealer.AidRequest request){
         SplitMenuButton button = new SplitMenuButton();
         final StringBuilder stringBuilder = new StringBuilder();
-        for(String tag : tags){
-            stringBuilder.append("#");
-            stringBuilder.append(tag);
-            stringBuilder.append(" ");
-        }
+        for(String tag : request.getTagsList())
+            stringBuilder.append("#").append(tag).append(" ");
         button.setText(stringBuilder.toString());
-
+        button.setUserData(request);
         button.setContentDisplay(ContentDisplay.RIGHT);
         button.setPopupSide(Side.LEFT);
         button.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
@@ -272,5 +289,21 @@ public class AgentDashboardController {
                 }
 
             }
+    }
+
+    private synchronized boolean isConnected(){
+        return connected;
+    }
+
+    private synchronized boolean isRunning(){
+        return running;
+    }
+
+    private synchronized void setConnected(boolean newValue){
+        connected = newValue;
+    }
+
+    private synchronized void stopRunning(){
+        running = false;
     }
 }

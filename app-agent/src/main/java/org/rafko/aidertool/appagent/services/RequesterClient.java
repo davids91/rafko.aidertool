@@ -5,12 +5,15 @@ import org.rafko.aidertool.RequestDealer;
 import org.rafko.aidertool.RequestHandlerGrpc;
 import io.grpc.Channel;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RequesterClient {
     private static final Logger LOGGER = Logger.getLogger(RequesterClient.class.getName());
     private final RequestHandlerGrpc.RequestHandlerBlockingStub blockingCaller;
+
     private final String userID;
     public RequesterClient(Channel channel, String userID_){
         blockingCaller = RequestHandlerGrpc.newBlockingStub(channel);
@@ -40,5 +43,13 @@ public class RequesterClient {
             if(!currentTags.contains(tag))
                 currentTags.add(tag);
         }
+    }
+
+    public ArrayList<RequestDealer.AidRequest> getRequests(){
+        ArrayList<RequestDealer.AidRequest> requests = new ArrayList<>();
+        Iterator<RequestDealer.AidRequest> iterator = blockingCaller.queryRequests(RequestDealer.AidToken.newBuilder().build());
+        while(iterator.hasNext())
+            requests.add(RequestDealer.AidRequest.newBuilder(iterator.next()).build());
+        return requests;
     }
 }

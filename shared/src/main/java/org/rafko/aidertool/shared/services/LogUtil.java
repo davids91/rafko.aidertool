@@ -19,8 +19,6 @@ public class LogUtil {
                 RequestDealer.AidToken token = RequestDealer.AidToken.parseFrom(new FileInputStream(tagsFile));
                 tagsContainer.clear();
                 tagsContainer.addAll(token.getTagsList());
-                System.out.print("Tags:");
-                for(String tag : tagsContainer)System.out.print(tag + ",");
             }
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Unable to parse stored tags file" + tagsFile.getAbsolutePath(), e);
@@ -28,7 +26,6 @@ public class LogUtil {
     }
 
     public static void writeTags(ListProperty<String> tagsContainer){
-        System.out.println("Writing tags yout!");
         try { /* Read in tags locally if possible */
             if(tagsFile.exists()||tagsFile.createNewFile()){
                 RequestDealer.AidToken token = RequestDealer.AidToken.newBuilder()
