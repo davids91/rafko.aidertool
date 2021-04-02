@@ -134,33 +134,43 @@ public class AgentDashboardController {
 
     private void sync(){
         while(isRunning()) {
-            if (isConnected()) {
-                caller.updateTags(agentStats.getTagsProperty());
-                /* TODO: Query requests */
-                /* TODO: Filter query based on tags */
-                /* TODO: Update UI based on available requests */
-                pauseThread();
-            }
+            trySync();
+            if(isConnected()){
+                pauseThread(5000);
+            }else pauseThread(500);
+        }
+    }
+
+    private void trySync(){
+        if (isConnected()) {
+            caller.updateTags(agentStats.getTagsProperty());
+            /* TODO: Query requests */
+            /* TODO: Filter query based on tags */
+            /* TODO: Update UI based on available requests */
         }
     }
 
     private void checkConnection(){
         while(isRunning()){
-            if (caller.testConnection()) {
-                setConnected(true);
-                Platform.runLater(this::setUIToConnected);
-            } else {
-                setConnected(false);
-                Platform.runLater(this::setUItoDisconnected);
-            }
-            pauseThread();
+            tryConnection();
+            pauseThread(500);
         }
     }
 
-    private void pauseThread(){
+    private void tryConnection(){
+        if (caller.testConnection()) {
+            setConnected(true);
+            Platform.runLater(this::setUIToConnected);
+        } else {
+            setConnected(false);
+            Platform.runLater(this::setUItoDisconnected);
+        }
+    }
+
+    private void pauseThread(long millisecondsBase){
         try {
-            if(isConnected()) Thread.sleep(30000);
-            else Thread.sleep(5000);
+            if(isConnected()) Thread.sleep(6 * millisecondsBase);
+            else Thread.sleep(millisecondsBase);
         } catch (InterruptedException e) {
             LOGGER.log(Level.WARNING,"Connection thread interrupted!");
         }
@@ -246,16 +256,21 @@ public class AgentDashboardController {
     }
 
     public void requestHelpDialog() {
-        try {
-            Stage tagTest = new Stage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/TagsEditor.fxml"));
-            loader.setControllerFactory(param -> new TagsEditorController(agentStats, this::sendHelpRequest));
-            Parent root = loader.load();
-            Scene tagsScene = new Scene(root, 400, 200);
-            tagTest.setScene(tagsScene);
-            tagTest.show();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Unable to load Tags view!", e);
-        }
+            tryConnection();
+            if(isConnected()){
+                trySync();
+                try {
+                    Stage tagTest = new Stage();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/TagsEditor.fxml"));
+                    loader.setControllerFactory(param -> new TagsEditorController(agentStats, this::sendHelpRequest));
+                    Parent root = loader.load();
+                    Scene tagsScene = new Scene(root, 400, 200);
+                    tagTest.setScene(tagsScene);
+                    tagTest.show();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Unable to load Tags view!", e);
+                }
+
+            }
     }
 }
