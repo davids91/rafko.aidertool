@@ -1,4 +1,4 @@
-package org.rafko.aidertool.appdealer.services;
+package org.rafko.aidertool.shared.services;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -23,7 +23,6 @@ public class NetUtil {
     }
 
     public static String getWANIP(){
-
         String text = "<UNKNOWN>";
         /* get the IP address and display it */
         try (java.util.Scanner s = new java.util.Scanner(new java.net.URL("https://ip.seeip.org").openStream(), "UTF-8").useDelimiter("\\A")) {

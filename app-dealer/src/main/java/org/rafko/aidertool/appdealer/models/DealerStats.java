@@ -1,6 +1,6 @@
 package org.rafko.aidertool.appdealer.models;
 
-import org.rafko.aidertool.appdealer.services.NetUtil;
+import org.rafko.aidertool.shared.services.NetUtil;
 import org.rafko.aidertool.shared.models.Stats;
 
 import java.util.logging.Level;

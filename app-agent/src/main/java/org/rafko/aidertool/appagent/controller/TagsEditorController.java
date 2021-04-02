@@ -16,7 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.rafko.aidertool.appagent.models.AgentStats;
-import org.rafko.aidertool.appagent.services.StringUtil;
+import org.rafko.aidertool.shared.services.StringUtil;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public class TagsEditorController implements Initializable {
     private String generateTextFromTags(){
         StringBuilder tagsSummary = new StringBuilder();
         for(String tag : typedTagsList){ /* Generate the text for every tag */
-            double spacesNeeded = Math.max(0.0,(buttonIconSize)/Math.max(1.0,StringUtil.getStringWidth(" ",tagsField.getFont())));
+            double spacesNeeded = Math.max(0.0,(buttonIconSize)/Math.max(1.0,StringUtil.getStringWidth(" ", tagsField.getFont())));
             tagsSummary.append(tag);
             for(int i=0; i < spacesNeeded; ++i) tagsSummary.append(" ");
         }

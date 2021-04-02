@@ -37,7 +37,7 @@ repositories {
 
 javafx {
     version = "11.0.2"
-    modules = [ 'javafx.base' ]
+    modules = [ 'javafx.base', 'javafx.graphics' ]
 }
 
 def grpcVersion = '1.35.0'
