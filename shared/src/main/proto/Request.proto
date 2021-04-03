@@ -20,6 +20,7 @@ enum HelpState{
   STATE_ACTIVE = 3; /* Request is actively being worked on */
   STATE_PENDING = 4; /* Request marked finished either by the requester or a helper */
   STATE_FINISHED = 10; /* Request finished */
+  STATE_CANCELLED = 11;
 }
 
 /**
@@ -31,6 +32,7 @@ message AidRequest{
   string requestID = 1;
   string requesterUUID = 2;
   string helperUUID = 3;
+  string finalizedBy = 4;
   HelpState state = 10;
   repeated string tags = 11;
 }
@@ -56,7 +58,7 @@ service RequestHandler{
    * @STATE_OPEN
    *  -> Can only be initiated by a non-requester. Pushes the request state to be @STATE_ACTIVE
    * @STATE_POSTPONED
-   *  -> Can be initiated by anyone. If non-requester initiates it,
+   *  //Not implemented yet//-> Can be initiated by anyone. If non-requester initiates it,
    *     the requester has to confirm it to push the request state to be @STATE_ACTIVE
    * @STATE_ACTIVE
    *  -> Can be initiated by requester only; Confirming that the request has been fulfilled
@@ -74,9 +76,9 @@ service RequestHandler{
   /**
    * Requests can be postponed by
    *  -> The requester: signaling that there is a low priority of the postponed request
-   *  -> Non-requester: signaling that help will be on its way shortly
+   *  //Not implemented yet// -> Non-requester: signaling that help will be on its way shortly
    *  Requests can be postponed in the @STATE_OPEN and @STATE_ACTIVE states.
-   *  Postponing the request by a non-requester updates the @helperUUID of the request.
+   *  //Not implemented yet// Postponing the request by a non-requester updates the @helperUUID of the request.
    */
   rpc postpone(AidToken) returns (AidToken);
 
