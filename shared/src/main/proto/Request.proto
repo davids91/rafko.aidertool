@@ -5,34 +5,41 @@ option java_outer_classname = "RequestDealer";
 
 package AiderTool;
 
-enum RequestState{
-  STATE_UNKNOWN = 0; /* Request in undefined state */
-  STATE_INVALID = 1; /* Request knowingly invalid */
-  STATE_REQUEST_REJECTED = 2; /* Request rejected */
-  STATE_REQUEST_OK = 3; /* Request accepted */
-  STATE_OPEN = 10; /* Request awaits helpers */
-  STATE_POSTPONED = 11; /* Request either de-prioritized by requester, or tentatively accepted by a helper */
-  STATE_ACTIVE = 12; /* Request is actively being worked on */
-  STATE_PENDING = 14; /* Request marked finished either by the requester or a helper */
-  STATE_FINISHED = 20; /* Request finished */
-  STATE_CANCELLED = 21; /* Request cancelled by requester */
+enum RequestResponse{
+  QUERY_UNKNOWN = 0;
+  QUERY_INVALID = 1;
+  QUERY_REJECTED = 2;
+  QUERY_CHANGED = 3;
+  QUERY_OK = 4;
+}
+
+enum HelpState{
+  STATE_UNKNOWN = 0;
+  STATE_OPEN = 1; /* Request awaits helpers */
+  STATE_POSTPONED = 2; /* Request either de-prioritized by requester, or tentatively accepted by a helper */
+  STATE_ACTIVE = 3; /* Request is actively being worked on */
+  STATE_PENDING = 4; /* Request marked finished either by the requester or a helper */
+  STATE_FINISHED = 10; /* Request finished */
+  STATE_CANCELLED = 11; /* Request cancelled by requester */
 }
 
 /**
- * Contains a request for help, complete with a unique ID and some tags
+ * Contains a request for help, complete with a unique ID and some tags,
+ *  original requester and the userID of the user who last modified the request state
+ *  (either a requester or someone who signaled to help ).
  */
 message AidRequest{
   string requestID = 1;
   string requesterUUID = 2;
   string lastStateInitiatedBy = 3;
-  RequestState state = 10;
+  HelpState state = 10;
   repeated string tags = 11;
 }
 
 message AidToken{
   string requestID = 1;
   string UserUUID = 2;
-  RequestState state = 10;
+  RequestResponse state = 10;
   repeated string tags = 11;
   repeated string data = 12;
 }
@@ -47,5 +54,6 @@ service RequestHandler{
   rpc ping(AidRequest) returns (AidToken);
   rpc queryRequest(AidToken) returns (AidToken);
   rpc queryRequests(AidToken) returns (stream AidRequest);
+  rpc queryRequestsChanged(AidToken) returns (AidToken);
   rpc queryTags(AidToken) returns (AidToken); /* empty tags field means all tags */
 }

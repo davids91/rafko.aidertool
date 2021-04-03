@@ -79,13 +79,13 @@ public class DealerServer {
                 }
                 requests.add(
                     RequestDealer.AidRequest.newBuilder(request)
-                    .setState(RequestDealer.RequestState.STATE_OPEN)
+                    .setState(RequestDealer.HelpState.STATE_OPEN)
                     .setRequestID(UUID.randomUUID().toString())
                     .build()
                 );
-                responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestState.STATE_REQUEST_OK).build());
+                responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestResponse.QUERY_OK).build());
             }else{
-                responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestState.STATE_REQUEST_REJECTED).build());
+                responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestResponse.QUERY_REJECTED).build());
             }
 
             responseObserver.onCompleted();
@@ -136,7 +136,7 @@ public class DealerServer {
         @Override
         public void ping(RequestDealer.AidRequest request, StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.INFO,"ping received from : " + request.getRequesterUUID() + "!");
-            responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestState.STATE_REQUEST_OK).build());
+            responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestResponse.QUERY_OK).build());
             responseObserver.onCompleted();
         }
     }

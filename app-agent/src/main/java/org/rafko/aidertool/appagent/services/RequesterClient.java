@@ -25,7 +25,7 @@ public class RequesterClient {
         .setRequesterUUID(userID)
         .build();
         try{
-            if(RequestDealer.RequestState.STATE_REQUEST_OK ==  blockingCaller.ping(aidRq).getState())
+            if(RequestDealer.RequestResponse.QUERY_OK ==  blockingCaller.ping(aidRq).getState())
                 return true;
         } catch (Exception e) {
             LOGGER.log(Level.WARNING,"Unable to communicate with channel!", e);

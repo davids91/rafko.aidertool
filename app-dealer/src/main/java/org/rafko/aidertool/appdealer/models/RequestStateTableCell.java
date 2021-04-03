@@ -8,13 +8,13 @@ import javafx.scene.control.TableCell;
 import org.rafko.aidertool.RequestDealer;
 
 public class RequestStateTableCell extends TableCell<RequestDealer.AidRequest, String> {
-    private static final RequestDealer.RequestState[] stateValues = {
-        RequestDealer.RequestState.STATE_OPEN,
-        RequestDealer.RequestState.STATE_POSTPONED,
-        RequestDealer.RequestState.STATE_ACTIVE,
-        RequestDealer.RequestState.STATE_PENDING,
-        RequestDealer.RequestState.STATE_FINISHED,
-        RequestDealer.RequestState.STATE_CANCELLED,
+    private static final RequestDealer.HelpState[] stateValues = {
+        RequestDealer.HelpState.STATE_OPEN,
+        RequestDealer.HelpState.STATE_POSTPONED,
+        RequestDealer.HelpState.STATE_ACTIVE,
+        RequestDealer.HelpState.STATE_PENDING,
+        RequestDealer.HelpState.STATE_FINISHED,
+        RequestDealer.HelpState.STATE_CANCELLED,
     };
     private final ListProperty<RequestDealer.AidRequest> requestsLists;
     ContextMenu editMenu = new ContextMenu();
@@ -29,9 +29,9 @@ public class RequestStateTableCell extends TableCell<RequestDealer.AidRequest, S
                 RequestDealer.AidRequest toSwitch = getTableRow().getItem();
                 requestsLists.remove(toSwitch);
                 requestsLists.add(
-                        RequestDealer.AidRequest.newBuilder(toSwitch)
-                                .setState(stateValues[finalI])
-                                .build()
+                    RequestDealer.AidRequest.newBuilder(toSwitch)
+                    .setState(stateValues[finalI])
+                    .build()
                 );
                 commitEdit(getText());
             });

@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Node;
-
 public class AgentDashboardController {
     private static final Logger LOGGER = Logger.getLogger(AgentDashboardController.class.getName());
     private static final Image notConnectedIcon = new Image("Img/not_connected.png");
@@ -81,7 +79,7 @@ public class AgentDashboardController {
             RequestDealer.AidRequest request = RequestDealer.AidRequest.newBuilder()
                     .addAllTags(tags).setRequesterUUID(agentStats.getUserName())
                     .build();
-            if(RequestDealer.RequestState.STATE_REQUEST_OK == caller.addRequest(request).getState())
+            if(RequestDealer.RequestResponse.QUERY_OK == caller.addRequest(request).getState())
                 System.out.println("SUCCESS!");
             trySync();
 
@@ -96,9 +94,7 @@ public class AgentDashboardController {
         moveButton.setOnMouseDragged(event -> primaryStage.setY(event.getScreenY() - yOffset));
 
         /* Set queried requests list changeListener */
-        /*rootVBox.getChildren().add(createButtonForAidRequests());*/
         requests.addListener((ListChangeListener<? super RequestDealer.AidRequest>) change -> {
-            System.out.println("changes:");
             while (change.next()) {
                 if (change.wasAdded()) {
                     for(RequestDealer.AidRequest request : change.getAddedSubList()){
@@ -251,6 +247,14 @@ public class AgentDashboardController {
         for(String tag : request.getTagsList())
             stringBuilder.append("#").append(tag).append(" ");
         button.setText(stringBuilder.toString());
+        switch (request.getState()){
+            case STATE_OPEN:button.setStyle("-fx-mark-color: green;"); break;
+            case STATE_POSTPONED:button.setStyle("-fx-mark-color: cadetblue ;"); break;
+            case STATE_ACTIVE:button.setStyle("-fx-mark-color: orange;"); break;
+            case STATE_PENDING:button.setStyle("-fx-mark-color: yellow;"); break;
+            case STATE_FINISHED:button.setStyle("-fx-mark-color: lightgreen;"); break;
+            default: button.setStyle("-fx-mark-color: red;");
+        }
         button.setUserData(request);
         button.setContentDisplay(ContentDisplay.RIGHT);
         button.setPopupSide(Side.LEFT);
