@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -31,6 +32,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.rafko.aidertool.RequestDealer;
 import org.rafko.aidertool.appagent.models.AgentStats;
+import org.rafko.aidertool.appagent.models.AidRequestMenuButton;
 import org.rafko.aidertool.appagent.services.RequesterClient;
 
 import java.io.IOException;
@@ -98,7 +100,7 @@ public class AgentDashboardController {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for(RequestDealer.AidRequest request : change.getAddedSubList()){
-                        Platform.runLater(()->rootVBox.getChildren().add(createButtonForAidRequest(request)));
+                        Platform.runLater(()->rootVBox.getChildren().add(new AidRequestMenuButton(request)));
                     }
                 }else{
                     Platform.runLater(()->rootVBox.getChildren().removeIf(node ->
@@ -239,30 +241,6 @@ public class AgentDashboardController {
             }),
             new KeyFrame(Duration.millis(50),new KeyValue(writableStageWidth, 300.0))
         )::play);
-    }
-
-    private SplitMenuButton createButtonForAidRequest(RequestDealer.AidRequest request){
-        SplitMenuButton button = new SplitMenuButton();
-        final StringBuilder stringBuilder = new StringBuilder();
-        for(String tag : request.getTagsList())
-            stringBuilder.append("#").append(tag).append(" ");
-        button.setText(stringBuilder.toString());
-        switch (request.getState()){
-            case STATE_OPEN:button.setStyle("-fx-mark-color: green;"); break;
-            case STATE_POSTPONED:button.setStyle("-fx-mark-color: cadetblue ;"); break;
-            case STATE_ACTIVE:button.setStyle("-fx-mark-color: orange;"); break;
-            case STATE_PENDING:button.setStyle("-fx-mark-color: yellow;"); break;
-            case STATE_FINISHED:button.setStyle("-fx-mark-color: lightgreen;"); break;
-            default: button.setStyle("-fx-mark-color: red;");
-        }
-        button.setUserData(request);
-        button.setContentDisplay(ContentDisplay.RIGHT);
-        button.setPopupSide(Side.LEFT);
-        button.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        button.setMaxSize(250,30);
-        button.setOnMouseEntered(event -> button.setPrefSize((9 * stringBuilder.length()),30));
-        button.setOnMouseExited(event -> button.setPrefSize(0,30));
-        return button;
     }
 
     public void quitApp() {
