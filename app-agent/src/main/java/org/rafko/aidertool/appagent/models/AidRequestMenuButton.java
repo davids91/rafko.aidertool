@@ -34,18 +34,18 @@ public class AidRequestMenuButton extends SplitMenuButton {
         /* Userdata and styling */
         switch (request.getState()){
             case STATE_OPEN:setStyle("-fx-mark-color: green;"); break;
-            case STATE_POSTPONED:setStyle("-fx-mark-color: cadetblue;"); break;
+            case STATE_POSTPONED:setStyle("-fx-mark-color: gainsboro;"); break;
             case STATE_ACTIVE:setStyle("-fx-mark-color: orange;"); break;
             case STATE_PENDING:setStyle("-fx-mark-color: yellow;"); break;
             case STATE_FINISHED:setStyle("-fx-mark-color: lightgreen;"); break;
             default: setStyle("-fx-mark-color: red;");
         }
+
         setUserData(request);
         setContentDisplay(ContentDisplay.RIGHT);
         setPopupSide(Side.LEFT);
         setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         setPrefWidth(USE_COMPUTED_SIZE);
-        setStyle("hoverable");
         setOnMouseEntered(event -> setPadding(new Insets(0, 13, 0, 2)));
         setOnMouseExited(event -> setPadding(new Insets(0, 0, 0, 0)));
     }

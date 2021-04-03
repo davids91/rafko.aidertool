@@ -13,11 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -45,6 +41,10 @@ public class AgentDashboardController {
     private static final Logger LOGGER = Logger.getLogger(AgentDashboardController.class.getName());
     private static final Image notConnectedIcon = new Image("Img/not_connected.png");
     private static final Image connectedIcon = new Image("Img/connected.png");
+    private static final int MS_WIGGLE_ROOM = 3;
+    private static final int CONNECTION_RECHECK_AFTER_MS = 1000;
+    private static final int REQUESTS_RECHECK_AFTER_MS = 3000;
+    private static final int TAGS_RECHECK_AFTER_MS = 10000;
     @FXML AnchorPane rootPanel;
     @FXML MenuItem requestHelpBtn;
     @FXML ImageView statusIcon;
@@ -64,6 +64,8 @@ public class AgentDashboardController {
     private boolean hideStage = false;
     private boolean running = true;
     private boolean connected = false;
+    private boolean tagsChecked = false;
+    private boolean requestsChecked = false;
 
     public AgentDashboardController(Stage parent_, AgentStats agentStats_){
         agentStats = agentStats_;
@@ -136,61 +138,68 @@ public class AgentDashboardController {
         hideStage();
     }
 
-    private void sync(){
-        while(isRunning()) {
-            trySync();
-            if(isConnected()){
-                pauseThread(5000);
-            }else pauseThread(500);
+    private void trySync(){
+        if (isConnected()) {
+            if(
+                (!tagsChecked) /* check the tags only once per a few sawtooth iterations */
+                &&(MS_WIGGLE_ROOM > (System.currentTimeMillis() % TAGS_RECHECK_AFTER_MS))
+            ){ /* Query tags */
+                caller.updateTags(agentStats.getTagsProperty());
+                tagsChecked = true;
+                System.out.println("Tags!");
+            }
+            if(MS_WIGGLE_ROOM < (System.currentTimeMillis() % REQUESTS_RECHECK_AFTER_MS)){
+                requestsChecked = false;
+            }
+
+
+            if((!requestsChecked)&&(MS_WIGGLE_ROOM > (System.currentTimeMillis() % REQUESTS_RECHECK_AFTER_MS))){
+                System.out.println("requests!" + System.currentTimeMillis());
+                ArrayList<RequestDealer.AidRequest> queriedRequests = caller.getRequests();
+                ArrayList<RequestDealer.AidRequest> requestsToRemove = new ArrayList<>();
+                for(RequestDealer.AidRequest request : queriedRequests){ /* Query Actual requests */
+                    if(!requests.contains(request)){ /* Add the new requests to the locally stored list */
+                        requests.add(request);
+                    }
+                }
+                for(RequestDealer.AidRequest request : requests){ /* Update local requests */
+                    if(!queriedRequests.contains(request)){ /* Mark every request not contained in the new list to be removed */
+                        requestsToRemove.add(request);
+                    }
+                }
+                for(RequestDealer.AidRequest request : requestsToRemove)
+                    requests.remove(request); /* Remove marked requests */
+                requestsChecked = true;
+            }
+            if(MS_WIGGLE_ROOM < (System.currentTimeMillis() % TAGS_RECHECK_AFTER_MS)){
+                tagsChecked = false;
+            }
+
+            /* TODO: Filter query based on tags */
         }
     }
 
-    private void trySync(){
-        if (isConnected()) {
-            caller.updateTags(agentStats.getTagsProperty()); /* Query tags */
-            ArrayList<RequestDealer.AidRequest> queriedRequests = caller.getRequests();
-            ArrayList<RequestDealer.AidRequest> requestsToRemove = new ArrayList<>();
-            for(RequestDealer.AidRequest request : queriedRequests){ /* Query Actual requests */
-                if(!requests.contains(request)){ /* Add the new requests to the locally stored list */
-                    requests.add(request);
-                }
-            }
-            for(RequestDealer.AidRequest request : requests){ /* Update local requests */
-                if(!queriedRequests.contains(request)){ /* Mark every request not contained in the new list to be removed */
-                    requestsToRemove.add(request);
-                }
-            }
-            for(RequestDealer.AidRequest request : requestsToRemove)
-                requests.remove(request); /* Remove marked requests */
-
-            /* TODO: Filter query based on tags */
-            /* TODO: Update UI based on available requests */
+    private void sync(){
+        while(isRunning()) {
+            trySync();
         }
     }
 
     private void checkConnection(){
         while(isRunning()){
             tryConnection();
-            pauseThread(500);
         }
     }
 
     private void tryConnection(){
-        if (caller.testConnection()) {
-            setConnected(true);
-            Platform.runLater(this::setUIToConnected);
-        } else {
-            setConnected(false);
-            Platform.runLater(this::setUItoDisconnected);
-        }
-    }
-
-    private void pauseThread(long millisecondsBase){
-        try {
-            if(isConnected()) Thread.sleep(6 * millisecondsBase);
-            else Thread.sleep(millisecondsBase);
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.WARNING,"Connection thread interrupted!");
+        if(MS_WIGGLE_ROOM > (System.currentTimeMillis() % CONNECTION_RECHECK_AFTER_MS)){
+            if (caller.testConnection()) {
+                setConnected(true);
+                Platform.runLater(this::setUIToConnected);
+            } else {
+                setConnected(false);
+                Platform.runLater(this::setUItoDisconnected);
+            }
         }
     }
 

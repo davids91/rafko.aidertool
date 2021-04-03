@@ -26,6 +26,7 @@ public class DealerServer {
     public DealerServer(DealerStats stats_){
         stats = stats_;
         requests = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
+
     }
 
     public void start(int port) throws IOException {
@@ -42,7 +43,7 @@ public class DealerServer {
                 try {
                     DealerServer.this.stop();
                 } catch (InterruptedException e) {
-
+                    LOGGER.log(Level.WARNING, "Interrupted at stop..", e);
                 }
                 LOGGER.log(Level.WARNING,"*** server shut down");
             }
@@ -70,11 +71,11 @@ public class DealerServer {
         @Override
         public void add(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
             if(!request.getRequesterUUID().isEmpty()) {
-                LOGGER.log(Level.INFO, "addRequest call received from : " + request.getRequesterUUID() + "!");
+                LOGGER.log(Level.FINE, "addRequest call received from : " + request.getRequesterUUID() + "!");
                 for (String tag : request.getTagsList()) { /* Add the requested tags into the stored ones */
                     if (!stats.getTagsProperty().contains(tag)) {
                         stats.getTagsProperty().add(tag);
-                        LOGGER.log(Level.INFO,"Adding tag: " + tag);
+                        LOGGER.log(Level.FINE,"Adding tag: " + tag);
                     }
                 }
                 requests.add(
@@ -93,17 +94,23 @@ public class DealerServer {
 
         @Override
         public void cancel(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"cancel request call received from : " + request.getRequesterUUID() + "!");
+            LOGGER.log(Level.FINE,"cancel request call received from : " + request.getRequesterUUID() + "!");
         }
 
         @Override
         public void queryRequest(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"queryRequest call received from : " + request.getUserUUID() + "!");
+            LOGGER.log(Level.FINE,"queryRequest call received from : " + request.getUserUUID() + "!");
+        }
+
+        @Override
+        public void queryRequestsChanged(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
+            /* TODO: Implement dirty bit, or remove service */
+            LOGGER.log(Level.SEVERE, "Unsupported operation queryRequestChanged!");
         }
 
         @Override
         public void queryRequests(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidRequest> responseObserver) {
-            LOGGER.log(Level.INFO,"queryRequests call received from : " + request.getUserUUID() + "!");
+            LOGGER.log(Level.FINE,"queryRequests call received from : " + request.getUserUUID() + "!");
             for(RequestDealer.AidRequest storedRequest : requests){ /* TODO filter for tags */
                 StringBuilder tagsSummary = new StringBuilder();
                 for(String tag : storedRequest.getTagsList()) tagsSummary.append(tag).append(", ");
@@ -115,7 +122,7 @@ public class DealerServer {
 
         @Override
         public void queryTags(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"Providing tags to: " + request.getUserUUID());
+            LOGGER.log(Level.FINE,"Providing tags to: " + request.getUserUUID());
             RequestDealer.AidToken tagsContainer = RequestDealer.AidToken.newBuilder()
             .addAllTags(stats.getTagsProperty())
             .build();
@@ -125,17 +132,22 @@ public class DealerServer {
 
         @Override
         public void initiate(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"initiate call received!");
+            LOGGER.log(Level.FINE,"initiate call received!");
+        }
+
+        @Override
+        public void postpone(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
+            LOGGER.log(Level.FINE,"postpone call received!");
         }
 
         @Override
         public void finalize(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"finalize call received!");
+            LOGGER.log(Level.FINE,"finalize call received!");
         }
 
         @Override
         public void ping(RequestDealer.AidRequest request, StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.INFO,"ping received from : " + request.getRequesterUUID() + "!");
+            LOGGER.log(Level.FINE,"ping received from : " + request.getRequesterUUID() + "!");
             responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestResponse.QUERY_OK).build());
             responseObserver.onCompleted();
         }
