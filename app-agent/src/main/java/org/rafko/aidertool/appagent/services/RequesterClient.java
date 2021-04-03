@@ -21,11 +21,11 @@ public class RequesterClient {
     }
 
     public boolean testConnection(){
-        RequestDealer.AidRequest aidRq = RequestDealer.AidRequest.newBuilder()
-        .setRequesterUUID(userID)
+        RequestDealer.AidToken token = RequestDealer.AidToken.newBuilder()
+        .setUserUUID(userID)
         .build();
         try{
-            if(RequestDealer.RequestResponse.QUERY_OK ==  blockingCaller.ping(aidRq).getState())
+            if(RequestDealer.RequestResponse.QUERY_OK ==  blockingCaller.ping(token).getState())
                 return true;
         } catch (Exception e) {
             LOGGER.log(Level.WARNING,"Unable to communicate with channel!", e);
@@ -51,5 +51,41 @@ public class RequesterClient {
         while(iterator.hasNext())
             requests.add(RequestDealer.AidRequest.newBuilder(iterator.next()).build());
         return requests;
+    }
+
+    public boolean initiateRequest(String requestID){
+        RequestDealer.AidToken response = blockingCaller.initiate(
+            RequestDealer.AidToken.newBuilder()
+            .setUserUUID(userID).setRequestID(requestID)
+            .build()
+        );
+        return (response.getState() == RequestDealer.RequestResponse.QUERY_OK);
+    }
+
+    public boolean cancelRequest(String requestID){
+        RequestDealer.AidToken response = blockingCaller.cancel(
+            RequestDealer.AidToken.newBuilder()
+            .setUserUUID(userID).setRequestID(requestID)
+            .build()
+        );
+        return (response.getState() == RequestDealer.RequestResponse.QUERY_OK);
+    }
+
+    public boolean postponeRequest(String requestID){
+        RequestDealer.AidToken response = blockingCaller.postpone(
+            RequestDealer.AidToken.newBuilder()
+            .setUserUUID(userID).setRequestID(requestID)
+            .build()
+        );
+        return (response.getState() == RequestDealer.RequestResponse.QUERY_OK);
+    }
+
+    public boolean finalizeRequest(String requestID){
+        RequestDealer.AidToken response = blockingCaller.finalize(
+            RequestDealer.AidToken.newBuilder()
+            .setUserUUID(userID).setRequestID(requestID)
+            .build()
+        );
+        return (response.getState() == RequestDealer.RequestResponse.QUERY_OK);
     }
 }

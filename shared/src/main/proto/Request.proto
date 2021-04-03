@@ -20,7 +20,6 @@ enum HelpState{
   STATE_ACTIVE = 3; /* Request is actively being worked on */
   STATE_PENDING = 4; /* Request marked finished either by the requester or a helper */
   STATE_FINISHED = 10; /* Request finished */
-  STATE_CANCELLED = 11; /* Request cancelled by requester */
 }
 
 /**
@@ -31,7 +30,7 @@ enum HelpState{
 message AidRequest{
   string requestID = 1;
   string requesterUUID = 2;
-  string lastStateInitiatedBy = 3;
+  string helperUUID = 3;
   HelpState state = 10;
   repeated string tags = 11;
 }
@@ -45,13 +44,51 @@ message AidToken{
 }
 
 service RequestHandler{
+  /**
+   * A request can be added any time
+   */
   rpc add(AidRequest) returns (AidToken);
-  rpc cancel(AidRequest) returns (AidToken);
-  rpc postpone(AidToken) returns (AidToken);
+
+  /**
+   * Open requests can be initiated by anyone other then the original requester.
+   * A request can not be initiated if it is in states @STATE_UNKNOWN, @STATE_ACTIVE or @STATE_FINISHED
+   * Initiate has different meanings in different states:
+   * @STATE_OPEN
+   *  -> Can only be initiated by a non-requester. Pushes the request state to be @STATE_ACTIVE
+   * @STATE_POSTPONED
+   *  -> Can be initiated by anyone. If non-requester initiates it,
+   *     the requester has to confirm it to push the request state to be @STATE_ACTIVE
+   * @STATE_ACTIVE
+   *  -> Can be initiated by requester only; Confirming that the request has been fulfilled
+   * @STATE_PENDING
+   *  -> Can be initiated by helper only. Both the requested and the helper needs to confirm
+   *     in order to push the state to @STATE_FINISHED
+   */
   rpc initiate(AidToken) returns (AidToken);
+
+  /**
+   * Any request can be cancelled at any state, but only by the requester.
+   */
+  rpc cancel(AidToken) returns (AidToken);
+
+  /**
+   * Requests can be postponed by
+   *  -> The requester: signaling that there is a low priority of the postponed request
+   *  -> Non-requester: signaling that help will be on its way shortly
+   *  Requests can be postponed in the @STATE_OPEN and @STATE_ACTIVE states.
+   *  Postponing the request by a non-requester updates the @helperUUID of the request.
+   */
+  rpc postpone(AidToken) returns (AidToken);
+
+  /**
+   * Finalizing a request means help was provided and accepted; THe underlying issue is solved
+   * or not solvable in the near future. A request can be finalized in the following states:
+   * -> @STATE_ACTIVE : by the requester, this puts the request to @STATE_PENDING
+   * -> @STATE_PENDING : by the helper, this puts the request to @STATE_FINISHED
+   */
   rpc finalize(AidToken) returns (AidToken);
 
-  rpc ping(AidRequest) returns (AidToken);
+  rpc ping(AidToken) returns (AidToken);
   rpc queryRequest(AidToken) returns (AidToken);
   rpc queryRequests(AidToken) returns (stream AidRequest);
   rpc queryRequestsChanged(AidToken) returns (AidToken);

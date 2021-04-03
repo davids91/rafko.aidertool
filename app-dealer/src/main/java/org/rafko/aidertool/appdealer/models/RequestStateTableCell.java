@@ -14,7 +14,6 @@ public class RequestStateTableCell extends TableCell<RequestDealer.AidRequest, S
         RequestDealer.HelpState.STATE_ACTIVE,
         RequestDealer.HelpState.STATE_PENDING,
         RequestDealer.HelpState.STATE_FINISHED,
-        RequestDealer.HelpState.STATE_CANCELLED,
     };
     private final ListProperty<RequestDealer.AidRequest> requestsLists;
     ContextMenu editMenu = new ContextMenu();

@@ -93,11 +93,6 @@ public class DealerServer {
         }
 
         @Override
-        public void cancel(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.FINE,"cancel request call received from : " + request.getRequesterUUID() + "!");
-        }
-
-        @Override
         public void queryRequest(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.FINE,"queryRequest call received from : " + request.getUserUUID() + "!");
         }
@@ -136,6 +131,23 @@ public class DealerServer {
         }
 
         @Override
+        public void cancel(RequestDealer.AidToken request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
+            LOGGER.log(Level.FINE,"cancel request call received from : " + request.getUserUUID() + "!");
+            RequestDealer.AidToken response;
+            if(removeRequestByID(request.getRequestID())){
+                response = RequestDealer.AidToken.newBuilder()
+                .setState(RequestDealer.RequestResponse.QUERY_OK)
+                .build();
+            }else{
+                response = RequestDealer.AidToken.newBuilder()
+                .setState(RequestDealer.RequestResponse.QUERY_REJECTED)
+                .build();
+            }
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
+
+        @Override
         public void postpone(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.FINE,"postpone call received!");
         }
@@ -146,8 +158,8 @@ public class DealerServer {
         }
 
         @Override
-        public void ping(RequestDealer.AidRequest request, StreamObserver<RequestDealer.AidToken> responseObserver) {
-            LOGGER.log(Level.FINE,"ping received from : " + request.getRequesterUUID() + "!");
+        public void ping(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
+            LOGGER.log(Level.FINE,"ping received from : " + request.getUserUUID() + "!");
             responseObserver.onNext(RequestDealer.AidToken.newBuilder().setState(RequestDealer.RequestResponse.QUERY_OK).build());
             responseObserver.onCompleted();
         }
@@ -155,6 +167,25 @@ public class DealerServer {
 
     public ListProperty<RequestDealer.AidRequest> getRequests(){
         return requests;
+    }
+
+    public RequestDealer.AidRequest getRequestByID(String id){
+        for(RequestDealer.AidRequest request : requests)
+            if(request.getRequestID().equals(id))return request;
+        LOGGER.log(Level.WARNING, "Couldn't find request " + id);
+        return null;
+    }
+
+    public boolean removeRequestByID(String id){
+        final boolean[] removed = {false};
+        requests.removeIf(request -> {
+            if(request.getRequestID().equals(id)){
+                removed[0] = true;
+                return true;
+            } return false;
+        });
+        LOGGER.log(Level.FINE,"Removed request " + id);
+        return removed[0];
     }
 
 }

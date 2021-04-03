@@ -7,15 +7,10 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import org.rafko.aidertool.RequestDealer;
+import org.rafko.aidertool.appagent.services.RequesterClient;
 
 public class AidRequestMenuButton extends SplitMenuButton {
-    private final MenuItem ignore;
-    private final MenuItem acceptReject;
-    private final MenuItem snooze;
-    private final MenuItem finalize;
-    private final MenuItem cancel;
-
-    public AidRequestMenuButton(RequestDealer.AidRequest request){
+    public AidRequestMenuButton(AgentStats stats, RequestDealer.AidRequest request, RequesterClient client_){
         /* Contents */
         final StringBuilder stringBuilder = new StringBuilder();
         for(String tag : request.getTagsList())
@@ -23,13 +18,17 @@ public class AidRequestMenuButton extends SplitMenuButton {
         setText(stringBuilder.toString());
 
         /* Available actions *//* TODO: realize actions */
-        ignore = new MenuItem("Ignore");
-        acceptReject = new MenuItem("Accept");
-        acceptReject.setVisible(false);
-        snooze = new MenuItem("Snooze");
-        finalize = new MenuItem("Finalize");
-        cancel = new MenuItem("Cancel");
-        getItems().addAll(ignore,acceptReject,snooze,finalize,cancel);
+        if(request.getRequesterUUID().equals(stats.getUserName())){
+            MenuItem acceptReject = new MenuItem("Accept");
+            acceptReject.setVisible(false);
+            MenuItem cancel = new MenuItem("Cancel");
+            cancel.setOnAction(event -> client_.cancelRequest(request.getRequestID()));
+            getItems().addAll(acceptReject,cancel);
+        }
+        MenuItem ignore = new MenuItem("Ignore");
+        MenuItem snooze = new MenuItem("Snooze");
+        MenuItem finalize = new MenuItem("Finalize");
+        getItems().addAll(ignore,snooze,finalize);
 
         /* Userdata and styling */
         switch (request.getState()){

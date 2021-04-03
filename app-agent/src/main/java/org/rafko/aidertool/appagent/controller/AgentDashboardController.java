@@ -102,7 +102,7 @@ public class AgentDashboardController {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for(RequestDealer.AidRequest request : change.getAddedSubList()){
-                        Platform.runLater(()->rootVBox.getChildren().add(new AidRequestMenuButton(request)));
+                        Platform.runLater(()->rootVBox.getChildren().add(new AidRequestMenuButton(agentStats, request, caller)));
                     }
                 }else{
                     Platform.runLater(()->rootVBox.getChildren().removeIf(node ->
