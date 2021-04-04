@@ -20,6 +20,7 @@
                   <MenuButton fx:id="menuButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0">
                      <items>
                         <MenuItem fx:id="requestHelpBtn" disable="true" mnemonicParsing="false" onAction="#requestHelpDialog" text="Request help.." />
+                        <MenuItem mnemonicParsing="false" onAction="#requestDataOffbeat" text="Refresh.." />
                         <MenuItem mnemonicParsing="false" onAction="#quitApp" text="Quit" />
                      </items>
                   </MenuButton>

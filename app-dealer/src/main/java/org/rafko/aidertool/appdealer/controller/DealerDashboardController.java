@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 public class DealerDashboardController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(DealerDashboardController.class.getName());
     @FXML TableView<RequestDealer.AidRequest> requestsTable;
+    @FXML TableColumn<RequestDealer.AidRequest, String> helperColumn;
+    @FXML TableColumn<RequestDealer.AidRequest, String> finalisedByColumn;
     @FXML TableColumn<RequestDealer.AidRequest, String> stateColumn;
     @FXML TableColumn<RequestDealer.AidRequest, String> requesterColumn;
     @FXML TableColumn<RequestDealer.AidRequest, String> tagsColumn;
@@ -36,17 +38,21 @@ public class DealerDashboardController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        /* Initialize Tags UI */
+        /* Initialize Tags Lists */
         knownTagsList.itemsProperty().bind(stats.getTagsProperty());
 
-        /* Initialize Requests UI */
+        /* Initialize Requests table */
         requestsTable.widthProperty().addListener((observable, oldValue, newValue) -> {
             stateColumn.setPrefWidth(newValue.doubleValue()/3.0);
             requesterColumn.setPrefWidth(newValue.doubleValue()/3.0);
+            helperColumn.setPrefWidth(newValue.doubleValue()/3.0);
+            finalisedByColumn.setPrefWidth(newValue.doubleValue()/3.0);
             tagsColumn.setPrefWidth(newValue.doubleValue()/2.0);
         });
         stateColumn.setCellValueFactory(param -> new Text(param.getValue().getState().toString()).textProperty());
         requesterColumn.setCellValueFactory(new PropertyValueFactory<>("requesterUUID"));
+        helperColumn.setCellValueFactory(new PropertyValueFactory<>("helperUUID"));
+        finalisedByColumn.setCellValueFactory(new PropertyValueFactory<>("finalizedBy"));
         tagsColumn.setCellValueFactory(param -> {
             StringBuilder tagsString = new StringBuilder();
             for(String tag : param.getValue().getTagsList()){

@@ -45,12 +45,24 @@ public class RequesterClient {
         }
     }
 
-    public ArrayList<RequestDealer.AidRequest> getRequests(){
-        ArrayList<RequestDealer.AidRequest> requests = new ArrayList<>();
+    public void getRequests(ListProperty<RequestDealer.AidRequest> storedRequests){
+        ArrayList<RequestDealer.AidRequest> streamedRequests = new ArrayList<>();
         Iterator<RequestDealer.AidRequest> iterator = blockingCaller.queryRequests(RequestDealer.AidToken.newBuilder().build());
         while(iterator.hasNext())
-            requests.add(RequestDealer.AidRequest.newBuilder(iterator.next()).build());
-        return requests;
+            streamedRequests.add(RequestDealer.AidRequest.newBuilder(iterator.next()).build());
+        ArrayList<RequestDealer.AidRequest> requestsToRemove = new ArrayList<>();
+        for(RequestDealer.AidRequest request : storedRequests){ /* Remove requests not on the other side */
+            if(!streamedRequests.contains(request)){ /* Mark every request not contained in the new list to be removed */
+                requestsToRemove.add(request);
+            }
+        }
+        for(RequestDealer.AidRequest request : requestsToRemove)
+            storedRequests.remove(request); /* Remove marked requests */
+        for(RequestDealer.AidRequest request : streamedRequests){ /* Query Actual requests */
+            if(!storedRequests.contains(request)){ /* Add the new requests to the locally stored list */
+                storedRequests.add(request);
+            }
+        }
     }
 
     public boolean initiateRequest(String requestID){

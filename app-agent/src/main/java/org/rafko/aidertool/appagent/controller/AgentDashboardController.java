@@ -43,8 +43,8 @@ public class AgentDashboardController {
     private static final Image connectedIcon = new Image("Img/connected.png");
     private static final int MS_WIGGLE_ROOM = 3;
     private static final int CONNECTION_RECHECK_AFTER_MS = 1000;
-    private static final int REQUESTS_RECHECK_AFTER_MS = 3000;
-    private static final int TAGS_RECHECK_AFTER_MS = 10000;
+    private static final int REQUESTS_RECHECK_AFTER_MS = 5000;
+    private static final int TAGS_RECHECK_AFTER_MS = 100000;
     @FXML AnchorPane rootPanel;
     @FXML MenuItem requestHelpBtn;
     @FXML ImageView statusIcon;
@@ -84,14 +84,13 @@ public class AgentDashboardController {
                     .addAllTags(tags).setRequesterUUID(agentStats.getUserName())
                     .build();
             if(RequestDealer.RequestResponse.QUERY_OK == caller.addRequest(request).getState())
-                System.out.println("SUCCESS!");
-            trySync();
-
+                LOGGER.log(Level.FINE, "Help Request successfully sent");
+            requestDataOffbeat();
         }else LOGGER.log(Level.SEVERE,"Unable to request help, no recipient found..");
     }
 
     @FXML
-    public void initialize() {
+    public void initialize(){
         /* UI related initialization */
         userId.setText(agentStats.getUserName());
         moveButton.setOnMousePressed(event -> yOffset = event.getSceneY());
@@ -138,6 +137,13 @@ public class AgentDashboardController {
         hideStage();
     }
 
+    public void requestDataOffbeat(){
+        if (isConnected()) {
+            caller.getRequests(requests);
+            caller.updateTags(agentStats.getTagsProperty());
+        }
+    }
+
     private void trySync(){
         if (isConnected()) {
             if(
@@ -146,35 +152,18 @@ public class AgentDashboardController {
             ){ /* Query tags */
                 caller.updateTags(agentStats.getTagsProperty());
                 tagsChecked = true;
-                System.out.println("Tags!");
-            }
-            if(MS_WIGGLE_ROOM < (System.currentTimeMillis() % REQUESTS_RECHECK_AFTER_MS)){
-                requestsChecked = false;
-            }
-
-
-            if((!requestsChecked)&&(MS_WIGGLE_ROOM > (System.currentTimeMillis() % REQUESTS_RECHECK_AFTER_MS))){
-                System.out.println("requests!" + System.currentTimeMillis());
-                ArrayList<RequestDealer.AidRequest> queriedRequests = caller.getRequests();
-                ArrayList<RequestDealer.AidRequest> requestsToRemove = new ArrayList<>();
-                for(RequestDealer.AidRequest request : queriedRequests){ /* Query Actual requests */
-                    if(!requests.contains(request)){ /* Add the new requests to the locally stored list */
-                        requests.add(request);
-                    }
-                }
-                for(RequestDealer.AidRequest request : requests){ /* Update local requests */
-                    if(!queriedRequests.contains(request)){ /* Mark every request not contained in the new list to be removed */
-                        requestsToRemove.add(request);
-                    }
-                }
-                for(RequestDealer.AidRequest request : requestsToRemove)
-                    requests.remove(request); /* Remove marked requests */
-                requestsChecked = true;
             }
             if(MS_WIGGLE_ROOM < (System.currentTimeMillis() % TAGS_RECHECK_AFTER_MS)){
                 tagsChecked = false;
             }
 
+            if((!requestsChecked)&&(MS_WIGGLE_ROOM > (System.currentTimeMillis() % REQUESTS_RECHECK_AFTER_MS))){
+                caller.getRequests(requests);
+                requestsChecked = true;
+            }
+            if(MS_WIGGLE_ROOM < (System.currentTimeMillis() % REQUESTS_RECHECK_AFTER_MS)){
+                requestsChecked = false;
+            }
             /* TODO: Filter query based on tags */
         }
     }
@@ -266,7 +255,6 @@ public class AgentDashboardController {
     public void requestHelpDialog() {
             tryConnection();
             if(isConnected()){
-                trySync();
                 try {
                     Stage tagTest = new Stage();
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/TagsEditor.fxml"));

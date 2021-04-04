@@ -287,8 +287,10 @@ public class DealerServer {
                 &&(
                     ( /* If the state is active, both the requester and helper can finalize */
                         (RequestDealer.HelpState.STATE_ACTIVE == storedRequest.getState())
-                        &&(storedRequest.getRequesterUUID().equals(request.getUserUUID()))
-                        &&(storedRequest.getHelperUUID().equals(request.getUserUUID()))
+                        &&(
+                            (storedRequest.getRequesterUUID().equals(request.getUserUUID()))
+                            ||(storedRequest.getHelperUUID().equals(request.getUserUUID()))
+                        )
                     )||( /* If the request is pending */
                         (RequestDealer.HelpState.STATE_PENDING == storedRequest.getState())
                         &&( /* Depending on who initiated the request */

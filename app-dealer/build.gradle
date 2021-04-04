@@ -17,6 +17,9 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
+group 'org.rafko'
+version '0.1-BETA'
+
 def grpcVersion = '1.35.0'
 def protobufVersion = '3.12.0'
 

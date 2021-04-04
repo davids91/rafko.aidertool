@@ -28,8 +28,10 @@
       <TableView fx:id="requestsTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
         <columns>
           <TableColumn fx:id="requesterColumn" minWidth="-Infinity" prefWidth="-1.0" text="Requester" />
+          <TableColumn fx:id="helperColumn" prefWidth="75.0" text="Helper" />
+          <TableColumn fx:id="finalisedByColumn" prefWidth="75.0" text="FinalisedBy" />
           <TableColumn fx:id="stateColumn" prefWidth="-1.0" text="State" />
-            <TableColumn fx:id="tagsColumn" prefWidth="-1.0" text="Tags" />
+          <TableColumn fx:id="tagsColumn" prefWidth="-1.0" text="Tags" />
         </columns>
       </TableView>
       <ListView fx:id="knownTagsList" GridPane.columnIndex="2" GridPane.rowIndex="1" />

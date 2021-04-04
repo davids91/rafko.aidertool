@@ -42,7 +42,7 @@ public class CopyAbleFieldController implements Initializable {
             final ClipboardContent content = new ClipboardContent();
             content.put(DataFormat.PLAIN_TEXT, fieldValueTextField.getText());
             Clipboard.getSystemClipboard().setContent(content);
-            LOGGER.log(Level.INFO, fieldName + ":" + fieldValue + "<-- in clipboard");
+            LOGGER.log(Level.INFO, fieldName + ":" + fieldValue + "<-- on clipboard");
 
             /* Display the clipboard animation */
             KeyValue transparent = new KeyValue(clipboard_img.opacityProperty(), 0.0);
