@@ -15,7 +15,11 @@ public class AidRequestMenuButton extends SplitMenuButton {
         final StringBuilder stringBuilder = new StringBuilder();
         for(String tag : request.getTagsList())
             stringBuilder.append("#").append(tag).append(" ");
-        setText(stringBuilder.toString());
+        if(request.getHelperUUID().isEmpty()){
+            setText(request.getRequesterUUID() + "/" + stringBuilder.toString() );
+        }else{
+            setText(request.getRequesterUUID() + "/" + stringBuilder.toString() +"; helped by: " + request.getHelperUUID());
+        }
 
         /* Decide menu points */
         MenuItem initiate = new MenuItem(); /* Accept? Finalize? Prioritize(de-snooze)? */

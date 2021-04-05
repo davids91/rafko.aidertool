@@ -39,8 +39,8 @@ application {
 jar {
     manifest {
         attributes (
-            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-            'Main-Class': 'Launcher'
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': application.getMainClass()
         )
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -51,7 +51,7 @@ task fatJar(type: Jar) {
     targetCompatibility = '1.8'
     manifest {
         attributes 'Implementation-Title': 'Aider Tool',
-                'Main-Class': 'Controller.Launcher'
+                'Main-Class': application.getMainClass()
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
