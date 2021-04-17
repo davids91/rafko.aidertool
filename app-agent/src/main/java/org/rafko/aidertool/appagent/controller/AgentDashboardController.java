@@ -89,14 +89,14 @@ public class AgentDashboardController {
         primaryStage = parent_;
         requests = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
         ManagedChannel channel = ManagedChannelBuilder.forTarget(agentStats.getDealerAddress())
-                .usePlaintext().build(); /* TODO: use SSL/TLS */
+                .usePlaintext().build();
         caller = new RequesterClient(channel, agentStats.getUserName());
         connectionThread = new Thread(this::checkConnection);
         syncThread = new Thread(this::sync);
     }
 
     public void sendHelpRequest(List<String> tags){
-        if(isConnected()){ /* TODO: Handle communication in an async way */
+        if(isConnected()){
             RequestDealer.AidRequest request = RequestDealer.AidRequest.newBuilder()
                 .setRequesterUUID(agentStats.getUserName())
                 .addData(RequestDealer.DataEntry.newBuilder()
@@ -184,7 +184,6 @@ public class AgentDashboardController {
             if(MS_WIGGLE_ROOM < (System.currentTimeMillis() % REQUESTS_RECHECK_AFTER_MS)){
                 requestsChecked = false;
             }
-            /* TODO: Filter query based on tags */
         }
     }
 
@@ -250,7 +249,7 @@ public class AgentDashboardController {
     }
 
     private void showStage(){
-        Platform.runLater(new Timeline( /* TODO: Use maximum size of request buttons */
+        Platform.runLater(new Timeline(
             new KeyFrame(Duration.ZERO,event -> {
                 rootVBox.setAlignment(Pos.CENTER_RIGHT);
                 statusBar.setAlignment(Pos.CENTER_RIGHT);

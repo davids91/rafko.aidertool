@@ -134,14 +134,13 @@ public class DealerServer {
 
         @Override
         public void queryRequestsChanged(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
-            /* TODO: Implement dirty bit, or remove service */
             LOGGER.log(Level.SEVERE, "Unsupported operation queryRequestChanged!");
         }
 
         @Override
         public void queryRequests(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidRequest> responseObserver) {
             LOGGER.log(Level.FINE,"queryRequests call received from : " + request.getUserUUID() + "!");
-            for(RequestDealer.AidRequest storedRequest : requests){ /* TODO filter for tags */
+            for(RequestDealer.AidRequest storedRequest : requests){
                 StringBuilder tagsSummary = new StringBuilder();
                 if(0 < storedRequest.getDataCount()) for(String tag : storedRequest.getData(0).getTagsList()) tagsSummary.append(tag).append(", ");
                 LOGGER.log(Level.INFO,"Providing request[of "+ storedRequest.getRequesterUUID() + "] with tags: " + tagsSummary.toString());

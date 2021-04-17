@@ -87,7 +87,7 @@ public class AidRequestMenuButton extends SplitMenuButton {
                 default: initiate.setVisible(false);
             }
         }else{
-            snooze.setVisible(false); /* TODO: Implement "help will eventually be available" state */
+            snooze.setVisible(false);
             switch (request.getState()){
                 case STATE_OPEN:{
                     initiate.setText("I'd like to help!");
@@ -95,7 +95,7 @@ public class AidRequestMenuButton extends SplitMenuButton {
                 }break;
                 case STATE_POSTPONED:{
                     initiate.setVisible(false);
-                }break; /* TODO: implement postponed aid request response */
+                }break;
                 case STATE_ACTIVE:{
                     initiate.setVisible(false);
                     if(request.getHelperUUID().equals(stats.getUserName())){
