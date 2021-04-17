@@ -21,6 +21,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Side;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import org.rafko.aidertool.RequestDealer;
@@ -28,16 +29,6 @@ import org.rafko.aidertool.appagent.services.RequesterClient;
 
 public class AidRequestMenuButton extends SplitMenuButton {
     public AidRequestMenuButton(AgentStats stats, RequestDealer.AidRequest request, RequesterClient client_){
-        /* Contents */
-        final StringBuilder stringBuilder = new StringBuilder();
-        if(0 < request.getDataCount()) for(String tag : request.getData(0).getTagsList())
-            stringBuilder.append("#").append(tag).append(" ");
-        if(request.getHelperUUID().isEmpty()){
-            setText(request.getRequesterUUID() + "/" + stringBuilder.toString() );
-        }else{
-            setText(request.getRequesterUUID() + "/" + stringBuilder.toString() +"; helped by: " + request.getHelperUUID());
-        }
-
         /* Decide menu points */
         MenuItem initiate = new MenuItem(); /* Accept? Finalize? Prioritize(de-snooze)? */
         MenuItem finalize = new MenuItem(); /* Help request finished */
@@ -161,6 +152,18 @@ public class AidRequestMenuButton extends SplitMenuButton {
             getItems().add(ignore);
         }
 
+        StringBuilder requestButtonString = new StringBuilder();
+        if(request.getRequesterUUID().equals(stats.getUserName())){
+            requestButtonString.append(request.getHelperUUID()).append(": ");
+        }else{
+            requestButtonString.append(request.getHelperUUID()).append(": ");
+        }
+        if(2 < requestButtonString.length())
+            requestButtonString = new StringBuilder("?:");
+        if(0 < request.getDataCount()) for(String tag : request.getData(0).getTagsList())
+            requestButtonString.append("#").append(tag).append(" ");
+        setText(requestButtonString.toString());
+
         /* User data and styling */
         switch (request.getState()){
             case STATE_OPEN:setStyle("-fx-mark-color: green;"); break;
@@ -170,11 +173,14 @@ public class AidRequestMenuButton extends SplitMenuButton {
             case STATE_FINISHED:setStyle("-fx-mark-color: lightgreen;"); break;
             default: setStyle("-fx-mark-color: red;");
         }
+        if(request.getRequesterUUID().equals(stats.getUserName()))
+            setStyle(getStyle() + "-fx-background-color:gainsboro;");
         setUserData(request);
         setContentDisplay(ContentDisplay.RIGHT);
         setPopupSide(Side.LEFT);
         setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         setPrefWidth(USE_COMPUTED_SIZE);
+        setMaxWidth(MenuButton.USE_COMPUTED_SIZE);
         setOnMouseEntered(event -> setPadding(new Insets(0, 13, 0, 2)));
         setOnMouseExited(event -> setPadding(new Insets(0, 0, 0, 0)));
     }
