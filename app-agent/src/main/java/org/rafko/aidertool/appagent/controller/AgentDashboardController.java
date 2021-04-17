@@ -98,8 +98,11 @@ public class AgentDashboardController {
     public void sendHelpRequest(List<String> tags){
         if(isConnected()){ /* TODO: Handle communication in an async way */
             RequestDealer.AidRequest request = RequestDealer.AidRequest.newBuilder()
-                    .addAllTags(tags).setRequesterUUID(agentStats.getUserName())
-                    .build();
+                .setRequesterUUID(agentStats.getUserName())
+                .addData(RequestDealer.DataEntry.newBuilder()
+                    .addAllTags(tags)
+                    .build())
+                .build();
             if(RequestDealer.RequestResponse.QUERY_OK == caller.addRequest(request).getState())
                 LOGGER.log(Level.FINE, "Help Request successfully sent");
             requestDataOffbeat();

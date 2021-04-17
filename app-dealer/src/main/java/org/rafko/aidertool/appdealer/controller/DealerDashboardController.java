@@ -72,7 +72,7 @@ public class DealerDashboardController implements Initializable {
         finalisedByColumn.setCellValueFactory(new PropertyValueFactory<>("finalizedBy"));
         tagsColumn.setCellValueFactory(param -> {
             StringBuilder tagsString = new StringBuilder();
-            for(String tag : param.getValue().getTagsList()){
+            if(0 < param.getValue().getDataCount()) for(String tag : param.getValue().getData(0).getTagsList()){
                 tagsString.append(tag).append(", ");
             }
             return new Text(StringUtil.replaceLast(tagsString.toString(),", *", "")).textProperty();

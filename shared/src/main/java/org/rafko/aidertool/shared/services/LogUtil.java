@@ -33,7 +33,7 @@ public class LogUtil {
     public static void readTags(ListProperty<String> tagsContainer){
         try { /* Read in tags locally if possible */
             if(tagsFile.exists()||tagsFile.createNewFile()){
-                RequestDealer.AidToken token = RequestDealer.AidToken.parseFrom(new FileInputStream(tagsFile));
+                RequestDealer.DataEntry token = RequestDealer.DataEntry.parseFrom(new FileInputStream(tagsFile));
                 tagsContainer.clear();
                 tagsContainer.addAll(token.getTagsList());
             }
@@ -45,7 +45,7 @@ public class LogUtil {
     public static void writeTags(ListProperty<String> tagsContainer){
         try { /* Read in tags locally if possible */
             if(tagsFile.exists()||tagsFile.createNewFile()){
-                RequestDealer.AidToken token = RequestDealer.AidToken.newBuilder()
+                RequestDealer.DataEntry token = RequestDealer.DataEntry.newBuilder()
                     .addAllTags(tagsContainer)
                     .build();
                 token.writeTo(new FileOutputStream(tagsFile));

@@ -30,7 +30,7 @@ public class AidRequestMenuButton extends SplitMenuButton {
     public AidRequestMenuButton(AgentStats stats, RequestDealer.AidRequest request, RequesterClient client_){
         /* Contents */
         final StringBuilder stringBuilder = new StringBuilder();
-        for(String tag : request.getTagsList())
+        if(0 < request.getDataCount()) for(String tag : request.getData(0).getTagsList())
             stringBuilder.append("#").append(tag).append(" ");
         if(request.getHelperUUID().isEmpty()){
             setText(request.getRequesterUUID() + "/" + stringBuilder.toString() );

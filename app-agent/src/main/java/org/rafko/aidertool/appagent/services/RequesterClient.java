@@ -56,7 +56,7 @@ public class RequesterClient {
 
     public void updateTags(ListProperty<String> currentTags){
         RequestDealer.AidToken response = blockingCaller.queryTags(RequestDealer.AidToken.newBuilder().build());
-        for(String tag : response.getTagsList()){
+        if(0 < response.getDataCount()) for(String tag : response.getData(0).getTagsList()){
             if(!currentTags.contains(tag))
                 currentTags.add(tag);
         }

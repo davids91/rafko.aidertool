@@ -107,7 +107,7 @@ public class DealerServer {
         public void add(RequestDealer.AidRequest request, io.grpc.stub.StreamObserver<RequestDealer.AidToken> responseObserver) {
             if(!request.getRequesterUUID().isEmpty()) {
                 LOGGER.log(Level.FINE, "addRequest call received from : " + request.getRequesterUUID() + "!");
-                for (String tag : request.getTagsList()) { /* Add the requested tags into the stored ones */
+                if(0 < request.getDataCount()) for(String tag : request.getData(0).getTagsList()) { /* Add the requested tags into the stored ones */
                     if (!stats.getTagsProperty().contains(tag)) {
                         stats.getTagsProperty().add(tag);
                         LOGGER.log(Level.FINE,"Adding tag: " + tag);
@@ -143,7 +143,7 @@ public class DealerServer {
             LOGGER.log(Level.FINE,"queryRequests call received from : " + request.getUserUUID() + "!");
             for(RequestDealer.AidRequest storedRequest : requests){ /* TODO filter for tags */
                 StringBuilder tagsSummary = new StringBuilder();
-                for(String tag : storedRequest.getTagsList()) tagsSummary.append(tag).append(", ");
+                if(0 < storedRequest.getDataCount()) for(String tag : storedRequest.getData(0).getTagsList()) tagsSummary.append(tag).append(", ");
                 LOGGER.log(Level.INFO,"Providing request[of "+ storedRequest.getRequesterUUID() + "] with tags: " + tagsSummary.toString());
                 responseObserver.onNext(storedRequest);
             }
@@ -154,7 +154,9 @@ public class DealerServer {
         public void queryTags(RequestDealer.AidToken request, StreamObserver<RequestDealer.AidToken> responseObserver) {
             LOGGER.log(Level.FINE,"Providing tags to: " + request.getUserUUID());
             RequestDealer.AidToken tagsContainer = RequestDealer.AidToken.newBuilder()
-            .addAllTags(stats.getTagsProperty())
+            .addData(RequestDealer.DataEntry.newBuilder()
+                .addAllTags(stats.getTagsProperty())
+                .build())
             .build();
             responseObserver.onNext(tagsContainer);
             responseObserver.onCompleted();

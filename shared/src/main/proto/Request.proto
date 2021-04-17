@@ -39,6 +39,11 @@ enum HelpState{
   STATE_CANCELLED = 11;
 }
 
+message DataEntry{
+  repeated string tags = 1;
+  repeated bytes data = 10;
+}
+
 /**
  * Contains a request for help, complete with a unique ID and some tags,
  *  original requester and the userID of the user who last modified the request state
@@ -50,15 +55,14 @@ message AidRequest{
   string helperUUID = 3;
   string finalizedBy = 4;
   HelpState state = 10;
-  repeated string tags = 11;
+  repeated DataEntry data = 11; /* First element(index 0) is always the tags in question */
 }
 
 message AidToken{
   string requestID = 1;
   string UserUUID = 2;
   RequestResponse state = 10;
-  repeated string tags = 11;
-  repeated string data = 12;
+  repeated DataEntry data = 11;
 }
 
 service RequestHandler{
