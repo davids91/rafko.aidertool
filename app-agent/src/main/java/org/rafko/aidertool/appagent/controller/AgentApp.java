@@ -1,3 +1,20 @@
+/*! This file is part of davids91/rafko.aidertool.
+ *
+ *    Rafko is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    Rafko is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with Rafko.  If not, see <https://www.gnu.org/licenses/> or
+ *    <https://github.com/davids91/rafko.aidertool/blob/main/LICENSE>
+ */
+
 package org.rafko.aidertool.appagent.controller;
 import org.rafko.aidertool.appagent.models.AgentStats;
 
@@ -22,8 +39,10 @@ public class AgentApp extends Application {
             LOGGER.log(Level.INFO, "Program arguments: ");
             for(String arg : args) LOGGER.log(Level.INFO, "->" + arg);
         }
-        if(0 == args.length) AGENT_STATS.setDealerAddress("localhost:50051");
-        else if(1 >= args.length) AGENT_STATS.setDealerAddress(args[0] + ":50051");
+        if(0 == args.length){
+            AGENT_STATS.setDealerAddress("localhost:50051");
+            /* try to read in INI file, create it if doesn't exist */
+        }else if(1 >= args.length) AGENT_STATS.setDealerAddress(args[0] + ":50051");
         else AGENT_STATS.setDealerAddress(args[0] + ":" + args[1]);
         LOGGER.log(Level.INFO,"Trying dealer address: " + AGENT_STATS.getDealerAddress());
         LogUtil.readTags(AGENT_STATS.getTagsProperty());
